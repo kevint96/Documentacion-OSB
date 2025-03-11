@@ -541,7 +541,7 @@ def extract_pipeline_path_from_proxy(proxy_path, jdeveloper_projects_dir):
             start = content.find('<ser:invoke ref="') + len('<ser:invoke ref="')
             end = content.find('"', start)
             pipeline_ref = content[start:end]
-            pipeline_path = os.path.join(jdeveloper_projects_dir, pipeline_ref + ".pipeline")
+            pipeline_path = os.path.join(jdeveloper_projects_dir, pipeline_ref + ".Pipeline")
             return pipeline_path
     except FileNotFoundError:
         print(f"El archivo {proxy_path} no pudo ser encontrado.")
@@ -577,7 +577,7 @@ def extract_osb_services_with_http_provider_id(project_path):
     for root, dirs, files in os.walk(project_path):
         if os.path.basename(root) == "Proxies":
             for file in files:
-                if file.endswith('.proxy'):
+                if file.endswith('.ProxyService'):
                     osb_file_path = os.path.join(root, file)
                     project_name = extract_project_name_from_proxy(osb_file_path)
                     if project_name is None:
@@ -682,22 +682,8 @@ def extraer_jar(archivo_jar):
 def generar_documentacion(jar_path, plantilla_path, destino_path):
     """Función que ejecuta la generación de documentación."""
     
-    if jar_path:
-        # Guardar el archivo en el sistema temporalmente
-        ruta_jar = os.path.join(tempfile.gettempdir(), jar_path.name)
-        st.success(f"ruta_jar: {ruta_jar}")
-        with open(ruta_jar, "wb") as f:
-            f.write(jar_path.getbuffer())
-
-        # Extraer el .jar
-        ruta_extraida = extraer_jar(ruta_jar)
-
-        if not ruta_extraida:
-            st.error("No se pudo extraer el .jar.")
-            return
-    
     # Extraer ruta del proyecto desde el .jar
-    jdeveloper_projects_dir = ruta_extraida
+    jdeveloper_projects_dir = jar_path
     
     if not jdeveloper_projects_dir:
         st.error("No se pudo determinar la ruta del proyecto desde el .jar.")
@@ -1056,7 +1042,7 @@ def main():
     if st.button("Generar Documentación"):
         if jar_file and plantilla_file and destino_path:
             with st.spinner("Generando documentación..."):
-                generar_documentacion(jar_file, plantilla_file, destino_path)
+                generar_documentacion(carpeta_destino, plantilla_file, destino_path)
         else:
             st.error("Por favor, sube todos los archivos y proporciona la ruta de destino.")
 
