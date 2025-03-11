@@ -1032,22 +1032,26 @@ def main():
     destino_path = st.text_input("Ruta donde se generarán los documentos")
     
     if jar_file:
-        # Guardar el archivo en una ubicación temporal
-        jar_path = os.path.join("temp.jar")
+        jar_path = "temp.jar"
+
+        # Guardar el archivo
         with open(jar_path, "wb") as f:
             f.write(jar_file.getbuffer())
 
-        # Extraer el contenido del JAR
-        extract_path = "jar_contents"
-        os.makedirs(extract_path, exist_ok=True)
+        # Ruta donde se extraerán los archivos
+        carpeta_destino = "extraccion_jar"
 
-        with zipfile.ZipFile(jar_path, "r") as jar:
-            jar.extractall(extract_path)
-            archivos = jar.namelist()
-
-        st.write("Archivos dentro del JAR:")
-        st.write(archivos)
-        st.success(f"archivos: {archivos}")
+        # Extraer los archivos del .jar
+        try:
+            with zipfile.ZipFile(jar_path, "r") as jar:
+                jar.extractall(carpeta_destino)
+                archivos_extraidos = jar.namelist()
+            
+            st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
+            st.write("📂 Archivos extraídos:")
+            st.write(archivos_extraidos)
+        except zipfile.BadZipFile:
+            st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
     
     if st.button("Generar Documentación"):
         if jar_file and plantilla_file and destino_path:
