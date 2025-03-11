@@ -698,6 +698,8 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir)
     
+    st.success(f"✅ services_with_data {services_with_data}")
+    
     es_type = False
     
     # Initialize an empty set to store unique operation names
@@ -722,6 +724,8 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
     operaciones_formateadas = "\n".join(f"* {op}" for op in unique_operations)
     
     print_with_line_number(f"unique_operations: {unique_operations}")
+    
+    st.success(f"✅ unique_operations {unique_operations}")
     
     operation_elements = {}
     
