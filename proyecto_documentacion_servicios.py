@@ -685,6 +685,8 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
     # Extraer ruta del proyecto desde el .jar
     jdeveloper_projects_dir = jar_path
     
+    st.success(f"✅ jdeveloper_projects_dir {jdeveloper_projects_dir}")
+    
     if not jdeveloper_projects_dir:
         st.error("No se pudo determinar la ruta del proyecto desde el .jar.")
         return
