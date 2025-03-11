@@ -289,20 +289,35 @@ def service_refs_ruta_pipeline(pipeline_path, project_path):
     return elemento
 
 def extract_xsd_import_paths(wsdl_path):
-    xsd_import_paths = set()  # Utilizamos un conjunto en lugar de una lista
-    if wsdl_path.endswith('.WSDL') and os.path.isfile(wsdl_path):
-        wsdl_dir = os.path.dirname(wsdl_path)
-        st.success(f"wsdl_dir: {wsdl_dir}")
-        with open(wsdl_path, 'r', encoding="utf-8") as f:
-            wsdl_content = f.read()
-            root = ET.fromstring(wsdl_content)
-            namespaces = {'xsd': 'http://www.w3.org/2001/XMLSchema'}
-            xsd_import_elements = root.findall(".//xsd:import[@schemaLocation]", namespaces)
-            for xsd_import in xsd_import_elements:
-                schema_location = xsd_import.attrib.get('schemaLocation', '')
-                st.success(f"schema_location: {schema_location}")
-                st.success(f"schema_ruta: {(os.path.normpath(os.path.join(wsdl_dir, schema_location)).replace('\\', '/'))}")
-                xsd_import_paths.add(os.path.normpath(os.path.join(wsdl_dir, schema_location)).replace('\\', '/'))
+    xsd_import_paths = set()  # Conjunto para almacenar rutas únicas
+
+    # Leer el contenido del archivo WSDL
+    with open(wsdl_path, 'r', encoding='utf-8') as file:
+        wsdl_content = file.read()
+
+    # Extraer el contenido dentro de CDATA usando una expresión regular
+    cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', wsdl_content, re.DOTALL)
+    
+    if cdata_match:
+        cdata_content = cdata_match.group(1)  # Obtener solo el contenido dentro de CDATA
+
+        # Parsear el contenido XML dentro del CDATA
+        try:
+            root = ET.fromstring(cdata_content)  # Convertir el CDATA en XML
+        except ET.ParseError as e:
+            print("Error al parsear el contenido de CDATA:", e)
+            return xsd_import_paths
+
+        # Espacios de nombres comunes en WSDL
+        namespaces = {
+            'xsd': 'http://www.w3.org/2001/XMLSchema'
+        }
+
+        # Buscar todos los elementos <xsd:import>
+        for xsd_import in root.findall(".//xsd:import", namespaces):
+            schema_location = xsd_import.get("schemaLocation")
+            if schema_location:
+                xsd_import_paths.add(schema_location)
     return list(xsd_import_paths)  # Convertimos el conjunto de vuelta a lista antes de devolverlo
 
 def find_import_elements_with_namespace(xsd_content, target_namespace, xsd_file_path):
