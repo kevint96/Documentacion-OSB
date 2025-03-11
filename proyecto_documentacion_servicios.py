@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import shutil
 from zipfile import ZipFile
+import tempfile
 from io import BytesIO
 from docx import Document
 from docx.shared import Pt
@@ -649,19 +650,39 @@ def extract_osb_services_with_http_provider_id(project_path):
     print_with_line_number(f"osb_services: {osb_services}")
     return osb_services
 
-def extraer_ruta_jar(jar_file):
-    """Extrae la ruta raíz del proyecto a partir del .jar subido."""
-    with ZipFile(jar_file, 'r') as jar:
-        nombres_archivos = jar.namelist()
-        for archivo in nombres_archivos:
-            if archivo.endswith(".wsdl"):
-                return os.path.dirname(archivo)
-    return None
+def extraer_jar(archivo_jar):
+    """ Extrae el contenido de un .jar en una carpeta temporal. """
+    try:
+        # Crear una carpeta temporal
+        ruta_temporal = tempfile.mkdtemp()
+
+        # Descomprimir el JAR (es un ZIP internamente)
+        with zipfile.ZipFile(archivo_jar, 'r') as jar:
+            jar.extractall(ruta_temporal)
+
+        return ruta_temporal
+    except Exception as e:
+        return f"Error al extraer el .jar: {e}"
 
 def generar_documentacion(jar_path, plantilla_path, destino_path):
     """Función que ejecuta la generación de documentación."""
+    
+    if jar_path:
+    # Guardar el archivo en el sistema temporalmente
+    ruta_jar = os.path.join(tempfile.gettempdir(), jar_path.name)
+    with open(ruta_jar, "wb") as f:
+        f.write(jar_path.getbuffer())
+
+    # Extraer el .jar
+    ruta_extraida = extraer_jar(ruta_jar)
+
+    if "Error" in ruta_extraida:
+        st.error("No se pudo extraer el .jar.")
+    else:
+        st.success(f"Proyecto extraído en: {ruta_extraida}")
+    
     # Extraer ruta del proyecto desde el .jar
-    jdeveloper_projects_dir = extraer_ruta_jar(jar_path) if jar_path else "C:/Users/ktorres/Desktop/BCS/BUS/Prueba2"
+    jdeveloper_projects_dir = ruta_extraida
     
     if not jdeveloper_projects_dir:
         st.error("No se pudo determinar la ruta del proyecto desde el .jar.")
