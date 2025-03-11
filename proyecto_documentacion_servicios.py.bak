@@ -580,14 +580,18 @@ def extract_osb_services_with_http_provider_id(project_path):
             for file in files:
                 if file.endswith('.ProxyService'):
                     osb_file_path = os.path.join(root, file)
+                    st.success(f"✅ osb_file_path {osb_file_path}")
                     project_name = extract_project_name_from_proxy(osb_file_path)
+                    st.success(f"✅ project_name {project_name}")
                     if project_name is None:
                         continue 
                     pipeline_path = extract_pipeline_path_from_proxy(osb_file_path, project_path)
+                    st.success(f"✅ pipeline_path {pipeline_path}")
                     with open(osb_file_path, 'r', encoding="utf-8") as f:
                         content = f.read()
                         if has_http_provider_id(content):
                             service_name = os.path.splitext(file)[0]
+                            st.success(f"✅ service_name {service_name}")
                             service_url = extract_service_url(content)
                             wsdl_relative_path = extract_wsdl_relative_path(content)
                             print_with_line_number(f"file: {file}")
