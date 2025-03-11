@@ -576,6 +576,7 @@ def extract_osb_services_with_http_provider_id(project_path):
     #print_with_line_number(f"project_path: {project_path}")
     for root, dirs, files in os.walk(project_path):
         if os.path.basename(root) == "Proxies":
+            st.success(f"✅ Proxies {elementos_xsd}")
             for file in files:
                 if file.endswith('.ProxyService'):
                     osb_file_path = os.path.join(root, file)
