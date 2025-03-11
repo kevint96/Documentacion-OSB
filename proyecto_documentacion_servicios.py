@@ -652,7 +652,7 @@ def extract_osb_services_with_http_provider_id(project_path):
     return osb_services
 
 def extraer_jar(archivo_jar):
-     """ Extrae el contenido de un .jar en una carpeta temporal en Windows. """
+    """ Extrae el contenido de un .jar en una carpeta temporal en Windows. """
     try:
         # Obtener la ruta temporal del usuario actual
         ruta_temporal = os.path.join(tempfile.gettempdir(), "extraccion_jar")
