@@ -3,6 +3,7 @@ import os
 import shutil
 from zipfile import ZipFile
 import tempfile
+import subprocess
 from io import BytesIO
 from docx import Document
 from docx.shared import Pt
@@ -651,15 +652,25 @@ def extract_osb_services_with_http_provider_id(project_path):
     return osb_services
 
 def extraer_jar(archivo_jar):
-    """ Extrae el contenido de un .jar en una carpeta temporal. """
+     """ Extrae el contenido de un .jar en una carpeta temporal en Windows. """
     try:
-        # Crear una carpeta temporal
-        ruta_temporal = tempfile.mkdtemp()
-        
+        # Obtener la ruta temporal del usuario actual
+        ruta_temporal = os.path.join(tempfile.gettempdir(), "extraccion_jar")
         st.success(f"ruta_temporal: {ruta_temporal}")
-        # Descomprimir el JAR (es un ZIP internamente)
-        with zipfile.ZipFile(archivo_jar, 'r') as jar:
-            jar.extractall(ruta_temporal)
+        
+        # Crear la carpeta si no existe
+        os.makedirs(ruta_temporal, exist_ok=True)
+
+        # Ejecutar comando Java para extraer el JAR
+        resultado = subprocess.run(
+            ["jar", "xf", archivo_jar], 
+            cwd=ruta_temporal,  # Extraer en la carpeta temporal
+            capture_output=True, text=True, shell=True
+        )
+
+        # Verificar si hubo errores
+        if resultado.returncode != 0:
+            raise Exception(resultado.stderr)
 
         return ruta_temporal
     except Exception as e:
