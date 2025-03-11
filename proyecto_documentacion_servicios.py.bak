@@ -654,27 +654,29 @@ def extract_osb_services_with_http_provider_id(project_path):
 def extraer_jar(archivo_jar):
     """ Extrae el contenido de un .jar en una carpeta temporal en Windows. """
     try:
-        # Obtener la ruta temporal del usuario actual
+        # Obtener la ruta temporal
         ruta_temporal = os.path.join(tempfile.gettempdir(), "extraccion_jar")
-        st.success(f"ruta_temporal: {ruta_temporal}")
-        
-        # Crear la carpeta si no existe
         os.makedirs(ruta_temporal, exist_ok=True)
 
-        # Ejecutar comando Java para extraer el JAR
+        # Verificar si el archivo JAR existe
+        if not os.path.exists(archivo_jar):
+            raise FileNotFoundError(f"El archivo .jar no existe: {archivo_jar}")
+
+        # Ejecutar el comando 'jar xf'
+        comando = f'java -jar {archivo_jar} -xf'
         resultado = subprocess.run(
-            ["jar", "xf", archivo_jar], 
-            cwd=ruta_temporal,  # Extraer en la carpeta temporal
-            capture_output=True, text=True, shell=True
+            comando, shell=True, cwd=ruta_temporal,
+            capture_output=True, text=True
         )
 
-        # Verificar si hubo errores
+        # Validar la ejecución
         if resultado.returncode != 0:
             raise Exception(resultado.stderr)
 
         return ruta_temporal
     except Exception as e:
-        return f"Error al extraer el .jar: {e}"
+        st.error(f"Error al extraer el .jar: {e}")
+        return None
 
 def generar_documentacion(jar_path, plantilla_path, destino_path):
     """Función que ejecuta la generación de documentación."""
@@ -689,10 +691,9 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
         # Extraer el .jar
         ruta_extraida = extraer_jar(ruta_jar)
 
-        if "Error" in ruta_extraida:
+        if not ruta_extraida:
             st.error("No se pudo extraer el .jar.")
-        else:
-            st.success(f"Proyecto extraído en: {ruta_extraida}")
+            return
     
     # Extraer ruta del proyecto desde el .jar
     jdeveloper_projects_dir = ruta_extraida

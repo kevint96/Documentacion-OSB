@@ -1030,6 +1030,24 @@ def main():
     plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
     destino_path = st.text_input("Ruta donde se generarán los documentos")
     
+    if jar_file:
+        # Guardar el archivo en una ubicación temporal
+        jar_path = os.path.join("temp.jar")
+        with open(jar_path, "wb") as f:
+            f.write(jar_file.getbuffer())
+
+        # Extraer el contenido del JAR
+        extract_path = "jar_contents"
+        os.makedirs(extract_path, exist_ok=True)
+
+        with zipfile.ZipFile(jar_path, "r") as jar:
+            jar.extractall(extract_path)
+            archivos = jar.namelist()
+
+        st.write("Archivos dentro del JAR:")
+        st.write(archivos)
+        st.success(f"archivos: {archivos}")
+    
     if st.button("Generar Documentación"):
         if jar_file and plantilla_file and destino_path:
             with st.spinner("Generando documentación..."):
