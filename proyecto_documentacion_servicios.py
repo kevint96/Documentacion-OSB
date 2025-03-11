@@ -655,7 +655,8 @@ def extraer_jar(archivo_jar):
     try:
         # Crear una carpeta temporal
         ruta_temporal = tempfile.mkdtemp()
-
+        
+        st.success(f"ruta_temporal: {ruta_temporal}")
         # Descomprimir el JAR (es un ZIP internamente)
         with zipfile.ZipFile(archivo_jar, 'r') as jar:
             jar.extractall(ruta_temporal)
@@ -670,6 +671,7 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
     if jar_path:
         # Guardar el archivo en el sistema temporalmente
         ruta_jar = os.path.join(tempfile.gettempdir(), jar_path.name)
+        st.success(f"ruta_jar: {ruta_jar}")
         with open(ruta_jar, "wb") as f:
             f.write(jar_path.getbuffer())
 
@@ -769,7 +771,7 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
         }
         
     print_with_line_number(f"operation_elements: {operation_elements}")
-    print_with_line_number(f"service_name: {service_name}")
+    #print_with_line_number(f"service_name: {service_name}")
     # Print the result
     for operation, elements in operation_elements.items():
         

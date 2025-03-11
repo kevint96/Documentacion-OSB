@@ -668,18 +668,18 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
     """Función que ejecuta la generación de documentación."""
     
     if jar_path:
-    # Guardar el archivo en el sistema temporalmente
-    ruta_jar = os.path.join(tempfile.gettempdir(), jar_path.name)
-    with open(ruta_jar, "wb") as f:
-        f.write(jar_path.getbuffer())
+        # Guardar el archivo en el sistema temporalmente
+        ruta_jar = os.path.join(tempfile.gettempdir(), jar_path.name)
+        with open(ruta_jar, "wb") as f:
+            f.write(jar_path.getbuffer())
 
-    # Extraer el .jar
-    ruta_extraida = extraer_jar(ruta_jar)
+        # Extraer el .jar
+        ruta_extraida = extraer_jar(ruta_jar)
 
-    if "Error" in ruta_extraida:
-        st.error("No se pudo extraer el .jar.")
-    else:
-        st.success(f"Proyecto extraído en: {ruta_extraida}")
+        if "Error" in ruta_extraida:
+            st.error("No se pudo extraer el .jar.")
+        else:
+            st.success(f"Proyecto extraído en: {ruta_extraida}")
     
     # Extraer ruta del proyecto desde el .jar
     jdeveloper_projects_dir = ruta_extraida
@@ -769,7 +769,7 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
         }
         
     print_with_line_number(f"operation_elements: {operation_elements}")
-    print_with_line_number(f"service_name: {service_name}")
+    #print_with_line_number(f"service_name: {service_name}")
     # Print the result
     for operation, elements in operation_elements.items():
         
