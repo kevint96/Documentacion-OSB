@@ -558,17 +558,15 @@ def extract_wsdl_relative_path(xml_content):
     
 def extract_wsdl_operations(wsdl_path):
     operations = set()  # Utilizamos un conjunto en lugar de una lista
-    if wsdl_path.endswith('.wsdl') and os.path.isfile(wsdl_path):
+    if wsdl_path.endswith('.WSDL') and os.path.isfile(wsdl_path):
         with open(wsdl_path, 'r', encoding="utf-8") as f:
             wsdl_content = f.read()
-            root = ET.fromstring(wsdl_content)
-            namespaces = {'wsdl': 'http://schemas.xmlsoap.org/wsdl/'}
-            operation_elements = root.findall(".//wsdl:operation", namespaces)
-            for operation in operation_elements:
-                operation_name = operation.attrib.get('name', '')
+            # Buscamos todas las coincidencias de "<operation name=" seguidas por el nombre de la operación
+            operation_names = re.findall(r'operation name="([^"]+)', wsdl_content)
+            for operation_name in operation_names:
                 operations.add(operation_name)  # Agregamos el nombre de la operación al conjunto
     return list(operations)  # Convertimos el conjunto de vuelta a lista antes de devolverlo
-
+  
 def extract_osb_services_with_http_provider_id(project_path):
 
     osb_services = []
@@ -608,7 +606,7 @@ def extract_osb_services_with_http_provider_id(project_path):
                             st.success(f"service_url: {service_url}")
                             st.success(f"wsdl_relative_path: {wsdl_relative_path}")
                             if wsdl_relative_path:
-                                wsdl_path = os.path.join(project_path, wsdl_relative_path + ".wsdl")
+                                wsdl_path = os.path.join(project_path, wsdl_relative_path + ".WSDL")
                                 capa_proyecto = '/'+ wsdl_relative_path.split('/')[0]
                                 print_with_line_number("")
                                 st.success(f"capa_proyecto: {capa_proyecto}")
