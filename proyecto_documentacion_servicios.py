@@ -290,7 +290,7 @@ def service_refs_ruta_pipeline(pipeline_path, project_path):
 
 def extract_xsd_import_paths(wsdl_path):
     xsd_import_paths = set()  # Utilizamos un conjunto en lugar de una lista
-    if wsdl_path.endswith('.wsdl') and os.path.isfile(wsdl_path):
+    if wsdl_path.endswith('.WSDL') and os.path.isfile(wsdl_path):
         wsdl_dir = os.path.dirname(wsdl_path)
         st.success(f"wsdl_dir: {wsdl_dir}")
         with open(wsdl_path, 'r', encoding="utf-8") as f:
