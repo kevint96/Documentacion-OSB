@@ -360,22 +360,17 @@ def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, op
         with open(xsd_file_path, 'r', encoding="utf-8") as f:
             xsd_content = f.read()
             
-            
-            # 🟢 Extraer contenido de CDATA
-            match = re.search(r"<!\[CDATA\[(.*?)\]\]>", xsd_content, re.DOTALL)
-                
-            if match:
-                xsd_content = match.group(1)  # Extrae solo el contenido del CDATA
-                st.success("Se extrajo el contenido dentro de CDATA correctamente.")
-            
-            
+            # Extraer el contenido real del CDATA si está presente
+            cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', xsd_content, re.DOTALL)
+            if cdata_match:
+                xsd_content = cdata_match.group(1)
+                st.success("Se ha extraído el contenido de CDATA correctamente")
             
             try:
                 root = ET.fromstring(xsd_content)
-            
             except ET.ParseError as e:
-                st.error(f"Error al parsear el XML: {e}")
-                return [], []
+                st.error(f"Error al analizar el XMLSchema: {e}")
+                return request_elements, response_elements
             
             namespaces = {'xsd': 'http://www.w3.org/2001/XMLSchema'}
             
@@ -386,7 +381,10 @@ def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, op
             st.success(f"ComplexTypes encontrados: {list(complex_types.keys())}")
 
             # Obtener los elementos principales del esquema
-            elements = root.findall("./xsd:element", namespaces)
+            elements = root.findall(".//xsd:element", namespaces)
+            
+            if not elements:
+                st.warning("No se encontraron elementos principales en el XSD.")
 
             # Explorar un complexType
             def explorar_complex_type(type_name, parent_element_name):
@@ -426,9 +424,9 @@ def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, op
                                 st.success(f"Elemento {full_name} tiene complexType anidado: {nested_type}")
                                 explorar_complex_type(nested_type, full_name)
                             else:
-                                st.success(f"complexType {element_type} no encontrado en el XSD")
+                                st.warning(f"complexType {element_type} no encontrado en el XSD")
                 else:
-                    st.success(f"complexType {type_name} no encontrado en el XSD")
+                    st.warning(f"complexType {type_name} no encontrado en el XSD")
 
             # Iterar sobre los elementos principales del XSD
             for element in elements:
@@ -442,6 +440,7 @@ def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, op
     st.success(f"Total elementos request: {len(request_elements)}")
     st.success(f"Total elementos response: {len(response_elements)}")
     return request_elements, response_elements
+
 
 def leer_xsd_file(xsd_file_path, complexType_name):
     elements_list = []
