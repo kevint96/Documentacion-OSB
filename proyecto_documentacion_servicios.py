@@ -1070,12 +1070,19 @@ def generar_documentacion(jar_path, plantilla_path):
             # Lista para almacenar las rutas de los documentos generados
             documentos_generados = []
 
-
-            ruta_guardado = os.path.join(ruta_temporal, f"Especificación Servicio WSDL {operation}.docx")
+            ruta_proyecto = ruta.strip("/")  # Asegurar que la ruta no tenga "/" al inicio
+            nombre_documento = f"Especificación Servicio WSDL {operation}.docx"
+            
+            # Crear la ruta dentro de la carpeta temporal
+            carpeta_destino = os.path.join(ruta_temporal, ruta_proyecto)
+            os.makedirs(carpeta_destino, exist_ok=True)  # Crear la carpeta si no existe
+            
+            ruta_guardado = os.path.join(carpeta_destino, nombre_documento)
             doc_nuevo = replace_text_in_doc(doc, variables)
             doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
                 
-            documentos_generados.append(ruta_guardado)  # Agregar a la lista
+            # Agregar a la lista de documentos generados
+            documentos_generados.append((ruta_guardado, os.path.join(ruta_proyecto, nombre_documento)))
             st.success(f"Documento guardado: {ruta_guardado}")
 
             # Crear el archivo ZIP en memoria
