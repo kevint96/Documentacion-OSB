@@ -471,6 +471,14 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url,
                     full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
                     st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
+                    # 🔹 Si el elemento tiene un xs:simpleType con xs:restriction
+                    simple_type = element.find('xs:simpleType', namespaces)
+                    if simple_type is not None:
+                        restriction = simple_type.find('xs:restriction', namespaces)
+                        if restriction is not None and 'base' in restriction.attrib:
+                            element_type = restriction.attrib['base']
+                            st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
+
                     # 🔹 Si element_type es primitivo (xsd:string, xs:int, etc.)
                     if element_type.startswith(("xsd:", "xs:")):
                         element_details = {
