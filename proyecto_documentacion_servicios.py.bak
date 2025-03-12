@@ -378,6 +378,8 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     
     #archivos_xsd = glob.glob(os.path.join(project_path, "**/*.XMLSchema"), recursive=True)
     #st.success(f"Archivos encontrados en extraccion_jar: {archivos_xsd}")
+    
+    xsd_file_path = ruta_corregida
 
 
     if xsd_file_path.endswith('.XMLSchema') and os.path.isfile(xsd_file_path):
