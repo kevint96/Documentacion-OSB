@@ -488,10 +488,8 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 element_name = element.attrib.get('name', '')
                 element_type = element.attrib.get('type', '')
 
-                # 🔹 **Mantener `parent_element_name` solo con el elemento raíz**
+                # 🔹 **Asegurar que `full_name` incluya toda la jerarquía**
                 full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-                root_element = parent_element_name  # 🔥 **Mantener el elemento raíz sin cambios**
-
                 st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
                 simple_type = element.find('xs:simpleType', namespaces)
@@ -503,8 +501,8 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
 
                 if element_type.startswith(("xsd:", "xs:")):
                     element_details = {
-                        'elemento': root_element,   # 🔥 **Mantener solo el padre original**
-                        'name': full_name,         # 🔥 **Concatenar correctamente para jerarquía**
+                        'elemento': parent_element_name,  # 🔥 **Mantener solo el padre original**
+                        'name': full_name,  # 🔥 **Asegurar que incluya el contexto anterior**
                         'type': element_type,
                         'url': service_url,
                         'ruta': capa_proyecto,
@@ -514,15 +512,15 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         'operation_actual': operation_actual,
                     }
                     st.success(f"Agregando elemento primitivo: {element_details}")
-                    if 'Request' in root_element:
+                    if 'Request' in parent_element_name:
                         request_elements.append(element_details)
-                    elif 'Response' in root_element:
+                    elif 'Response' in parent_element_name:
                         response_elements.append(element_details)
 
                 # ✅ Si es otro complexType dentro del mismo XSD
                 elif element_type in complex_types:
                     st.success(f"Buscando {element_type} en el mismo XSD")
-                    explorar_complex_type(element_type, root_element, complex_types, namespaces, imports, extraccion_dir, 
+                    explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                           operations, service_name, operation_actual, request_elements, response_elements, operation_name)
 
@@ -531,7 +529,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     
                     if nested_type in complex_types:
                         st.success(f"Buscando {nested_type} en el mismo XSD")
-                        explorar_complex_type(nested_type, root_element, complex_types, namespaces, imports, extraccion_dir, 
+                        explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                               operations, service_name, operation_actual, request_elements, response_elements, operation_name)
                     elif prefix in namespaces:
@@ -546,7 +544,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                                            capa_proyecto, operacion_business, operations, 
                                            service_name, operation_actual, 
                                            target_complex_type=nested_type, 
-                                           root_element_name=root_element)  # 🔥 **Mantener el padre original**
+                                           root_element_name=full_name)  # 🔥 **Mantener contexto en full_name**
                         else:
                             st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                     else:
