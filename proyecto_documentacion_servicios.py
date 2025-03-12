@@ -356,10 +356,27 @@ def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, op
     request_elements = []
     response_elements = []
 
-    if xsd_file_path.endswith('.xsd') and os.path.isfile(xsd_file_path):
+    if xsd_file_path.endswith('.XMLSchema') and os.path.isfile(xsd_file_path):
         with open(xsd_file_path, 'r', encoding="utf-8") as f:
             xsd_content = f.read()
-            root = ET.fromstring(xsd_content)
+            
+            
+            # 🟢 Extraer contenido de CDATA
+            match = re.search(r"<!\[CDATA\[(.*?)\]\]>", xsd_content, re.DOTALL)
+                
+            if match:
+                xsd_content = match.group(1)  # Extrae solo el contenido del CDATA
+                st.success("Se extrajo el contenido dentro de CDATA correctamente.")
+            
+            
+            
+            try:
+                root = ET.fromstring(xsd_content)
+            
+            except ET.ParseError as e:
+                st.error(f"Error al parsear el XML: {e}")
+                return [], []
+            
             namespaces = {'xsd': 'http://www.w3.org/2001/XMLSchema'}
             
             st.success(f"Procesando XSD: {xsd_file_path}")
@@ -667,6 +684,7 @@ def extract_osb_services_with_http_provider_id(project_path):
                                         st.success(f"service_url: {service_url}")
                                         st.success(f"capa_proyecto: {capa_proyecto}")
                                         st.success(f"operacion_business: {operacion_business}")
+                                        xsd = os.path.splitext(xsd)[0] + ".XMLSchema"
                                         #print_with_line_number("")
                                         #print_with_line_number("")
                                     

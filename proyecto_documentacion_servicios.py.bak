@@ -21,6 +21,7 @@ import re
 import inspect
 import ast
 from datetime import datetime
+import difflib
 
 def print_with_line_number(msg):
     caller_frame = inspect.currentframe().f_back
@@ -642,6 +643,15 @@ def extract_osb_services_with_http_provider_id(project_path):
                                         if operation.lower() in os.path.basename(xsd).lower():
                                             operation_to_xsd[operation] = xsd
                                             break
+                                        else:
+                                            xsd_names = [os.path.basename(xsd) for xsd in imports]  # Obtener solo los nombres de archivos XSD
+                                            closest_match = difflib.get_close_matches(operation, xsd_names, n=1, cutoff=0.5)  # Buscar el más similar
+
+                                            if closest_match:
+                                                matched_xsd = next(xsd for xsd in imports if os.path.basename(xsd) == closest_match[0])
+                                                operation_to_xsd[operation] = matched_xsd
+                                            else:
+                                                operation_to_xsd[operation] = None  # No se encontró una coincidencia
                                         
                                 
                                 st.success(f"operation_to_xsd: {operation_to_xsd}")
