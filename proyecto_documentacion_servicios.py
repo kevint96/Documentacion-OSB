@@ -359,13 +359,17 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     # Asegurar que xsd_file_path no tenga '/mount/' ni '/' inicial
     xsd_file_path = xsd_file_path.lstrip('/')
 
-    # Construir la ruta real basada en la carpeta de extracción
+    # Crear ruta real con `extraccion_jar`
     ruta_corregida = os.path.abspath(os.path.join(project_path, xsd_file_path))
 
-    # Depuración: listar archivos en la carpeta de extracción
-    st.success(f"Archivos disponibles en {project_path}: {os.listdir(project_path)}")
+    # DEBUG: Verificar qué hay dentro de `ComponentesComunes`
+    ruta_componentes = os.path.join(project_path, "ComponentesComunes")
+    if os.path.exists(ruta_componentes):
+        st.success(f"Contenido en ComponentesComunes: {os.listdir(ruta_componentes)}")
+    else:
+        st.error(f"No se encontró la carpeta: {ruta_componentes}")
 
-    # Mostrar información de depuración
+    # DEBUG: Mostrar ruta corregida y si el archivo existe
     st.success(f"Nombre del archivo corregido: {ruta_corregida}")
     st.success(f"Existe archivo: {os.path.isfile(ruta_corregida)}")
 

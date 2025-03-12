@@ -356,15 +356,19 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     request_elements = []
     response_elements = []
     
-    # Asegurar que xsd_file_path no tenga '/mount/' innecesario
+    # Asegurar que xsd_file_path no tenga '/mount/' ni '/' inicial
     xsd_file_path = xsd_file_path.lstrip('/')
 
     # Construir la ruta real basada en la carpeta de extracción
-    ruta_corregida = os.path.abspath(os.path.join(project_path, os.path.normpath(xsd_file_path)))
-    
-    st.success(f"project_path: {project_path}")
-    st.success(f"Nombre del archivo: {ruta_corregida}")
+    ruta_corregida = os.path.abspath(os.path.join(project_path, xsd_file_path))
+
+    # Depuración: listar archivos en la carpeta de extracción
+    st.success(f"Archivos disponibles en {project_path}: {os.listdir(project_path)}")
+
+    # Mostrar información de depuración
+    st.success(f"Nombre del archivo corregido: {ruta_corregida}")
     st.success(f"Existe archivo: {os.path.isfile(ruta_corregida)}")
+
 
     if xsd_file_path.endswith('.XMLSchema') and os.path.isfile(xsd_file_path):
         with open(xsd_file_path, 'r', encoding="utf-8") as f:
