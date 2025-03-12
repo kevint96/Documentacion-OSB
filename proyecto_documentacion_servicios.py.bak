@@ -402,34 +402,26 @@ def get_correct_xsd_path(current_xsd_path, schema_location):
 
     return corrected_path
 
-def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual):
+def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, 
+                   capa_proyecto, operacion_business, operations, 
+                   service_name, operation_actual, target_complex_type=None, parent_element_name=""):
     request_elements = []
     response_elements = []
     
     # Obtener la ruta absoluta correcta dentro de la carpeta de extracción
     extraccion_dir = os.path.abspath(project_path)
-    # Limpiar `xsd_file_path` eliminando barras extra y normalizando la ruta
-    xsd_file_path = os.path.normpath(xsd_file_path.strip("/\\"))  # Elimina / y \ iniciales
-    subcarpeta_xsd = os.path.dirname(xsd_file_path)  # Obtiene el path relativo dentro del ZIP
-    # Normalizar la subcarpeta eliminando "../"
+    xsd_file_path = os.path.normpath(xsd_file_path.strip("/\\"))  # Normalizar la ruta
+    subcarpeta_xsd = os.path.dirname(xsd_file_path)
     subcarpeta_xsd = os.path.normpath(subcarpeta_xsd).replace("../", "")
     
     # Construir la ruta final dentro de la carpeta de extracción
     ruta_corregida = os.path.join(extraccion_dir, subcarpeta_xsd, os.path.basename(xsd_file_path))
 
     # Depuración
-    st.success(f"extraccion_dir: {extraccion_dir}")
-    st.success(f"xsd_file_path limpio: {xsd_file_path}")
-    st.success(f"subcarpeta_xsd: {subcarpeta_xsd}")
-    st.success(f"Archivos disponibles en {extraccion_dir}: {os.listdir(extraccion_dir)}")
     st.success(f"Ruta corregida FINAL: {ruta_corregida}")
     st.success(f"¿El archivo existe?: {os.path.isfile(ruta_corregida)}")
     
-    #archivos_xsd = glob.glob(os.path.join(project_path, "**/*.XMLSchema"), recursive=True)
-    #st.success(f"Archivos encontrados en extraccion_jar: {archivos_xsd}")
-    
     xsd_file_path = ruta_corregida
-
 
     if not os.path.isfile(ruta_corregida):
         st.error(f"El archivo XSD {ruta_corregida} no existe.")
@@ -462,7 +454,7 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     st.success(f"ComplexTypes encontrados: {list(complex_types.keys())}")
 
     elements = root.findall(".//xs:element", namespaces)
-    
+
     # Explorar un complexType
     def explorar_complex_type(type_name, parent_element_name):
         """Explora recursivamente un complexType y extrae sus elementos internos."""
@@ -496,7 +488,8 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
                             request_elements.append(element_details)
                         elif 'Response' in parent_element_name:
                             response_elements.append(element_details)
-                    elif ':' in element_type:
+
+                    elif ':' in element_type:  # Elemento con namespace externo
                         prefix, nested_type = element_type.split(':')
                         if prefix in namespaces:
                             namespace = namespaces[prefix]
@@ -507,13 +500,28 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
                                 st.success(f"corrected_xsd_path: {corrected_xsd_path}")
                                 new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
                                 st.success(f"new_xsd_path: {new_xsd_path}")
-                                parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual)
+                                
+                                # Llamada recursiva buscando solo `nested_type`
+                                parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
+                                               capa_proyecto, operacion_business, operations, 
+                                               service_name, operation_actual, target_complex_type=nested_type, 
+                                               parent_element_name=full_name)
+
                         else:
                             st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                     else:
                         st.warning(f"complexType {element_type} no encontrado en el XSD")
         else:
             st.warning(f"complexType {type_name} no encontrado en el XSD")
+
+    # Si tenemos un target_complex_type, buscamos solo ese
+    if target_complex_type:
+        st.success(f"Buscando SOLO el complexType: {target_complex_type}")
+        if target_complex_type in complex_types:
+            explorar_complex_type(target_complex_type, parent_element_name)
+        else:
+            st.warning(f"El complexType {target_complex_type} no se encontró en el XSD.")
+        return request_elements, response_elements
 
     # Iterar sobre los elementos principales del XSD
     for element in elements:
