@@ -1106,25 +1106,25 @@ def generar_documentacion(jar_path, plantilla_path):
             # Procesar los datos
             for elem in elements['request']:
                 
-                if 'cabeceraEntrada.' not in elem['name']:
-                    # Añadir una nueva fila al final de la tabla
-                    fila = tabla_request.add_row().cells
-                    
-                    # Rellenar la fila con los datos correspondientes
-                    #fila[0].text = operation + "Request" + "." + elem['name']
-                    fila[0].text = elem['name']
-                    st.success(f"fila[0].text: {fila[0].text}")
-                    fila[1].text = elem['name']
-                    campo = fila[1].text.split('.')[-1]
-                    fila[1].text = campo
-                    st.success(f"fila[1].text: {fila[1].text}")
-                    fila[2].text = default_longitud
-                    fila[3].text = elem['type']
-                    tipo_campo = fila[3].text.split(':')[-1]
-                    if tipo_campo == 'string':
-                        tipo_campo = 'Alfanumérico'
-                    fila[3].text = tipo_campo
-                    st.success(f"fila[3].text: {fila[3].text}")
+                #if 'cabeceraEntrada.' not in elem['name']:
+                # Añadir una nueva fila al final de la tabla
+                fila = tabla_request.add_row().cells
+                
+                # Rellenar la fila con los datos correspondientes
+                #fila[0].text = operation + "Request" + "." + elem['name']
+                fila[0].text = elem['name']
+                st.success(f"fila[0].text: {fila[0].text}")
+                fila[1].text = elem['name']
+                campo = fila[1].text.split('.')[-1]
+                fila[1].text = campo
+                st.success(f"fila[1].text: {fila[1].text}")
+                fila[2].text = default_longitud
+                fila[3].text = elem['type']
+                tipo_campo = fila[3].text.split(':')[-1]
+                if tipo_campo == 'string':
+                    tipo_campo = 'Alfanumérico'
+                fila[3].text = tipo_campo
+                st.success(f"fila[3].text: {fila[3].text}")
                 
                 
             # Limpiar la tabla antes de agregar elementos de esta operación
@@ -1135,25 +1135,25 @@ def generar_documentacion(jar_path, plantilla_path):
             for elem in elements['response']:
                 
                 
-                if 'cabeceraSalida.' not in elem['name']:
-                    # Añadir una nueva fila al final de la tabla
-                    fila = tabla_response.add_row().cells
-                    
-                    # Rellenar la fila con los datos correspondientes
-                    #fila[0].text = operation + "Response" + "." + elem['name']
-                    fila[0].text = elem['name']
-                    st.success(f"fila[0].text: {fila[0].text}")
-                    fila[1].text = elem['name']
-                    campo = fila[1].text.split('.')[-1]
-                    fila[1].text = campo
-                    st.success(f"fila[1].text: {fila[1].text}")
-                    fila[2].text = default_longitud
-                    fila[3].text = elem['type']
-                    tipo_campo = fila[3].text.split(':')[-1]
-                    if tipo_campo == 'string':
-                        tipo_campo = 'Alfanumérico'
-                    fila[3].text = tipo_campo
-                    st.success(f"fila[3].text: {fila[3].text}")
+                #if 'cabeceraSalida.' not in elem['name']:
+                # Añadir una nueva fila al final de la tabla
+                fila = tabla_response.add_row().cells
+                
+                # Rellenar la fila con los datos correspondientes
+                #fila[0].text = operation + "Response" + "." + elem['name']
+                fila[0].text = elem['name']
+                st.success(f"fila[0].text: {fila[0].text}")
+                fila[1].text = elem['name']
+                campo = fila[1].text.split('.')[-1]
+                fila[1].text = campo
+                st.success(f"fila[1].text: {fila[1].text}")
+                fila[2].text = default_longitud
+                fila[3].text = elem['type']
+                tipo_campo = fila[3].text.split(':')[-1]
+                if tipo_campo == 'string':
+                    tipo_campo = 'Alfanumérico'
+                fila[3].text = tipo_campo
+                st.success(f"fila[3].text: {fila[3].text}")
 
             print_with_line_number("___________________________________________")
             
