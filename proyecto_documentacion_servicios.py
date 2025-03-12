@@ -749,7 +749,7 @@ def extraer_jar(archivo_jar):
         st.error(f"Error al extraer el .jar: {e}")
         return None
 
-def generar_documentacion(jar_path, plantilla_path, destino_path):
+def generar_documentacion(jar_path, plantilla_path):
     """Función que ejecuta la generación de documentación."""
     
     # Extraer ruta del proyecto desde el .jar
@@ -764,8 +764,9 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
     # Cargar el documento de la plantilla
     doc = Document(plantilla_path)
     
-    # Ruta de destino
-    ruta_raiz = destino_path if destino_path else 'C:/Users/ktorres/Desktop/BCS/DOCUMENTACION/'
+    # Crear una carpeta temporal para almacenar los documentos
+    temp_dir = tempfile.TemporaryDirectory()
+    ruta_temporal = temp_dir.name  # Obtener la ruta temporal
     
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir)
@@ -1063,23 +1064,38 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
 
             print_with_line_number("___________________________________________")
             
+            st.success(f"✅ temp_dir  {temp_dir }")
+            st.success(f"✅ ruta_temporal  {ruta_temporal }")
 
-            # Guardar el documento en la carpeta del entorno de ejecución
-            ruta_guardado = f"Especificación Servicio WSDL {operation}.docx"
-            doc_nuevo = replace_text_in_doc(doc, variables)
-            doc_nuevo.save(ruta_guardado)
+            # Lista para almacenar las rutas de los documentos generados
+            documentos_generados = []
 
-            st.success(f"Documento guardado en: {ruta_guardado}")
 
-            # Permitir la descarga del archivo desde la app
-            with open(ruta_guardado, "rb") as file:
-                file_bytes = file.read()
+            ruta_guardado = os.path.join(ruta_temporal, f"Especificación Servicio WSDL {operation}.docx")
+            doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
+                
+            documentos_generados.append(ruta_guardado)  # Agregar a la lista
+            st.success(f"Documento guardado: {ruta_guardado}")
+
+            # Crear el archivo ZIP en memoria
+            zip_buffer = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
+            zip_path = zip_buffer.name  # Obtener la ruta del archivo ZIP
+
+            with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for doc_path in documentos_generados:
+                    zipf.write(doc_path, os.path.basename(doc_path))  # Agregar cada archivo al ZIP
+
+            st.success(f"ZIP creado: {zip_path}")
+
+            # Permitir la descarga del ZIP desde Streamlit
+            with open(zip_path, "rb") as file:
+                zip_bytes = file.read()
 
             st.download_button(
-                label="📥 Descargar Documento",
-                data=file_bytes,
-                file_name=ruta_guardado,
-                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                label="📥 Descargar TODOS los documentos en ZIP",
+                data=zip_bytes,
+                file_name="Documentos_OSB.zip",
+                mime="application/zip"
             )
                 
     st.success("Documentación generada con éxito!")
@@ -1089,7 +1105,7 @@ def main():
     
     jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
     plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
-    destino_path = st.text_input("Ruta donde se generarán los documentos")
+    #destino_path = st.text_input("Ruta donde se generarán los documentos")
     
     if jar_file:
         jar_path = "temp.jar"
@@ -1114,9 +1130,9 @@ def main():
             st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
     
     if st.button("Generar Documentación"):
-        if jar_file and plantilla_file and destino_path:
+        if jar_file and plantilla_file:
             with st.spinner("Generando documentación..."):
-                generar_documentacion(carpeta_destino, plantilla_file, destino_path)
+                generar_documentacion(carpeta_destino, plantilla_file)
         else:
             st.error("Por favor, sube todos los archivos y proporciona la ruta de destino.")
 
