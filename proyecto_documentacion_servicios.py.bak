@@ -362,6 +362,8 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     # Limpiar `xsd_file_path` eliminando barras extra y normalizando la ruta
     xsd_file_path = os.path.normpath(xsd_file_path.strip("/\\"))  # Elimina / y \ iniciales
     subcarpeta_xsd = os.path.dirname(xsd_file_path)  # Obtiene el path relativo dentro del ZIP
+    # Normalizar la subcarpeta eliminando "../"
+    subcarpeta_xsd = os.path.normpath(subcarpeta_xsd).replace("../", "")
     
     # Construir la ruta final dentro de la carpeta de extracción
     ruta_corregida = os.path.join(extraccion_dir, subcarpeta_xsd, os.path.basename(xsd_file_path))
