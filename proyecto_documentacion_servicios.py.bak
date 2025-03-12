@@ -790,32 +790,33 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                         
                                 
                                 st.success(f"operation_to_xsd: {operation_to_xsd}")
-                                # Iterar sobre el diccionario y realizar la llamada a parse_xsd_file
-                                for operation_name, xsd in operation_to_xsd.items():
-                                    #print_with_line_number("")
-                                    operation_actual = operation_name
-                                    st.success(f"operation_actual: {operation_actual}")
-                                    st.success(f"operacion_a_documentar: {operacion_a_documentar}")
-                                    if not operacion_a_documentar or operation_name == operacion_a_documentar:
+                                
+                                # ✅ Si el usuario especificó una operación, verificar si existe en operation_to_xsd
+                                if operacion_a_documentar and operacion_a_documentar not in operation_to_xsd:
+                                    st.error("⛔ No se encuentra la operación en el .jar ⛔")
+                                else:
+                                    # Iterar sobre el diccionario y realizar la llamada a parse_xsd_file
+                                    for operation_name, xsd in operation_to_xsd.items():
+                                        #print_with_line_number("")
+                                        operation_actual = operation_name
                                         st.success(f"operation_actual: {operation_actual}")
-                                        st.success(f"service_name: {service_name}")
-                                        st.success(f"operation_name: {operation_name}")
-                                        st.success(f"xsd: {xsd}")
-                                        st.success(f"service_url: {service_url}")
-                                        st.success(f"capa_proyecto: {capa_proyecto}")
-                                        st.success(f"operacion_business: {operacion_business}")
-                                        xsd = os.path.splitext(xsd)[0] + ".XMLSchema"
-                                        #print_with_line_number("")
-                                        #print_with_line_number("")
-                                    
-                                        elementos_xsd = parse_xsd_file(project_path,xsd, operation_name,service_url,capa_proyecto,operacion_business,operations, service_name, operation_actual)
-                                        st.success(f"elementos_xsd: {elementos_xsd}")
-                                        #elementos_completos = list(elementos_xsd) + list(operations) + [operation_actual]
-                                        osb_services.append(elementos_xsd)
-                                    
-                                    else:
-                                        st.error("⛔ No se encuentra la operacion en el .jar ⛔")
-                                        return
+                                        st.success(f"operacion_a_documentar: {operacion_a_documentar}")
+                                        if not operacion_a_documentar or operation_name == operacion_a_documentar:
+                                            st.success(f"operation_actual: {operation_actual}")
+                                            st.success(f"service_name: {service_name}")
+                                            st.success(f"operation_name: {operation_name}")
+                                            st.success(f"xsd: {xsd}")
+                                            st.success(f"service_url: {service_url}")
+                                            st.success(f"capa_proyecto: {capa_proyecto}")
+                                            st.success(f"operacion_business: {operacion_business}")
+                                            xsd = os.path.splitext(xsd)[0] + ".XMLSchema"
+                                            #print_with_line_number("")
+                                            #print_with_line_number("")
+                                        
+                                            elementos_xsd = parse_xsd_file(project_path,xsd, operation_name,service_url,capa_proyecto,operacion_business,operations, service_name, operation_actual)
+                                            st.success(f"elementos_xsd: {elementos_xsd}")
+                                            #elementos_completos = list(elementos_xsd) + list(operations) + [operation_actual]
+                                            osb_services.append(elementos_xsd)
                                         
     st.success(f"osb_services: {osb_services}")
     return osb_services

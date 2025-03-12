@@ -451,11 +451,20 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     st.success(f"Namespaces detectados: {namespaces}")
     st.success(f"Imports encontrados: {imports}")
 
-    # Obtener todos los complexTypes
-    complex_types = {elem.attrib.get('name', None): elem for elem in root.findall(".//xs:complexType", namespaces) if 'name' in elem.attrib}
+    # 🔍 Buscar complexTypes con ambos prefijos (xs y xsd)
+    complex_types = {
+        elem.attrib.get('name', None): elem 
+        for prefix in ['xs', 'xsd']  # Iterar sobre ambos posibles prefijos
+        for elem in root.findall(f".//{prefix}:complexType", namespaces) 
+        if 'name' in elem.attrib
+    }
 
-    # ✅ Buscar los elementos principales del XSD (Request y Response)
-    root_elements = {elem.attrib.get('name', ''): elem.attrib.get('type', '').split(':')[-1] for elem in root.findall(".//xs:element", namespaces)}
+    # ✅ Buscar los elementos principales del XSD (Request y Response) con ambos prefijos
+    root_elements = {
+        elem.attrib.get('name', ''): elem.attrib.get('type', '').split(':')[-1]
+        for prefix in ['xs', 'xsd']  # Iterar sobre ambos prefijos
+        for elem in root.findall(f".//{prefix}:element", namespaces)
+    }
 
     # 🚀 **Si `target_complex_type` está definido, buscar SOLO ese complexType.**
     if target_complex_type:
@@ -486,25 +495,40 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
 
     type_name = type_name.split(':')[-1]  
 
-    if type_name in complex_types:
+        if type_name in complex_types:
         st.success(f"Explorando complexType: {type_name}")
-        sequence = complex_types[type_name].find('xs:sequence', namespaces)
+
+        # 🔹 Buscar 'sequence' con ambos prefijos
+        sequence = None
+        for prefix in ['xs', 'xsd']:
+            sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
+            if sequence is not None:
+                break  # Si ya encontró el sequence, no seguir buscando
 
         if sequence is not None:
-            for element in sequence.findall('xs:element', namespaces):
-                element_name = element.attrib.get('name', '')
-                element_type = element.attrib.get('type', '')
+            for prefix in ['xs', 'xsd']:
+                for element in sequence.findall(f'{prefix}:element', namespaces):
+                    element_name = element.attrib.get('name', '')
+                    element_type = element.attrib.get('type', '')
 
-                # 🔹 **Asegurar que `full_name` incluya toda la jerarquía**
-                full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-                st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
+                    full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
+                    st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
-                simple_type = element.find('xs:simpleType', namespaces)
-                if simple_type is not None:
-                    restriction = simple_type.find('xs:restriction', namespaces)
-                    if restriction is not None and 'base' in restriction.attrib:
-                        element_type = restriction.attrib['base']
-                        st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
+                    # 🔹 Buscar 'simpleType' con ambos prefijos
+                    simple_type = None
+                    for p in ['xs', 'xsd']:
+                        simple_type = element.find(f'{p}:simpleType', namespaces)
+                        if simple_type is not None:
+                            break
+
+                    if simple_type is not None:
+                        restriction = None
+                        for p in ['xs', 'xsd']:
+                            restriction = simple_type.find(f'{p}:restriction', namespaces)
+                            if restriction is not None and 'base' in restriction.attrib:
+                                element_type = restriction.attrib['base']
+                                st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
+                                break
 
                 if element_type.startswith(("xsd:", "xs:")):
                     element_details = {
