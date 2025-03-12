@@ -361,7 +361,7 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     xsd_file_path = xsd_file_path.lstrip('/')
 
     # Crear ruta real con `extraccion_jar`
-    ruta_corregida = os.path.abspath(os.path.join("extraccion_jar", os.path.normpath(xsd_file_path.lstrip('/'))))
+    ruta_corregida = os.path.join("extraccion_jar", xsd_file_path.lstrip('/'))
 
     # Ruta esperada
     ruta_resources = os.path.join(project_path, "ComponentesComunes", "Resources")
