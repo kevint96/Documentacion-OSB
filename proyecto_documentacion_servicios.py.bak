@@ -358,6 +358,7 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     
     ruta_corregida = os.path.abspath(os.path.join(project_path, os.path.normpath(xsd_file_path)))
     
+    st.success(f"project_path: {project_path}")
     st.success(f"Nombre del archivo: {ruta_corregida}")
     st.success(f"Existe archivo: {os.path.isfile(ruta_corregida)}")
 
