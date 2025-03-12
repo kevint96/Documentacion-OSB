@@ -469,6 +469,8 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                   operations, service_name, operation_actual, request_elements, response_elements,operation_name)
 
+    st.success(f"Total elementos request: {len(request_elements)}")
+    st.success(f"Total elementos response: {len(response_elements)}")
     return request_elements, response_elements
 
 
@@ -514,8 +516,10 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     st.success(f"Agregando elemento primitivo: {element_details}")
                     if 'Request' in parent_element_name:
                         request_elements.append(element_details)
+                        st.success(f"request_elements: {len(request_elements)}")
                     elif 'Response' in parent_element_name:
                         response_elements.append(element_details)
+                        st.success(f"response_elements: {len(response_elements)}")
 
                 # ✅ Si es otro complexType dentro del mismo XSD
                 elif element_type in complex_types:
