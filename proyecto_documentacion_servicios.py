@@ -404,12 +404,17 @@ def get_correct_xsd_path(current_xsd_path, schema_location):
 
 def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, capa_proyecto, 
                    operacion_business, operations, service_name, operation_actual, 
-                   target_complex_type=None, root_element_name=None):
+                   target_complex_type=None, root_element_name=None,
+                   request_elements=None, response_elements=None):
     """
     Parsea un XSD y extrae los elementos request/response de forma recursiva.
     """
-    request_elements = []
-    response_elements = []
+
+    # 🔹 Asegurar que las listas no se reinicien
+    if request_elements is None:
+        request_elements = []
+    if response_elements is None:
+        response_elements = []
 
     extraccion_dir = os.path.abspath(project_path)
     xsd_file_path = os.path.normpath(xsd_file_path.strip("/\\"))  
@@ -457,7 +462,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
         st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
         explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                              operations, service_name, operation_actual, request_elements, response_elements,operation_name)
+                              operations, service_name, operation_actual, request_elements, response_elements, operation_name)
         return request_elements, response_elements
 
     # 🔹 Si `target_complex_type` no está, procesamos TODO desde los elementos raíz.
@@ -467,7 +472,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
         if complex_type in complex_types:
             explorar_complex_type(complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                  operations, service_name, operation_actual, request_elements, response_elements,operation_name)
+                                  operations, service_name, operation_actual, request_elements, response_elements, operation_name)
 
     st.success(f"Total elementos request: {len(request_elements)}")
     st.success(f"Total elementos response: {len(response_elements)}")
@@ -514,14 +519,12 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         'operation_actual': operation_actual,
                     }
                     st.success(f"Agregando elemento primitivo: {element_details}")
+
                     if 'Request' in parent_element_name:
                         request_elements.append(element_details)
-                        st.success(f"request_elements: {request_elements}")
                     elif 'Response' in parent_element_name:
                         response_elements.append(element_details)
-                        st.success(f"response_elements: {response_elements}")
 
-                # ✅ Si es otro complexType dentro del mismo XSD
                 elif element_type in complex_types:
                     st.success(f"Buscando {element_type} en el mismo XSD")
                     explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
@@ -548,7 +551,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                                            capa_proyecto, operacion_business, operations, 
                                            service_name, operation_actual, 
                                            target_complex_type=nested_type, 
-                                           root_element_name=full_name)  # 🔥 **Mantener contexto en full_name**
+                                           root_element_name=full_name,
+                                           request_elements=request_elements,
+                                           response_elements=response_elements)
                         else:
                             st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                     else:
