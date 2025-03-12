@@ -718,7 +718,7 @@ def extract_wsdl_operations(wsdl_path):
                 operations.add(operation_name)  # Agregamos el nombre de la operación al conjunto
     return list(operations)  # Convertimos el conjunto de vuelta a lista antes de devolverlo
   
-def extract_osb_services_with_http_provider_id(project_path):
+def extract_osb_services_with_http_provider_id(project_path,operacion_a_documentar):
 
     osb_services = []
     elementos_xsd = []
@@ -794,7 +794,7 @@ def extract_osb_services_with_http_provider_id(project_path):
                                 for operation_name, xsd in operation_to_xsd.items():
                                     #print_with_line_number("")
                                     operation_actual = operation_name
-                                    if operation_name == 'consultarProductoRequiereFirmaV21':
+                                    if (operation_name == operacion_a_documentar or operacion_a_documentar is None):
                                         st.success(f"operation_actual: {operation_actual}")
                                         st.success(f"service_name: {service_name}")
                                         st.success(f"operation_name: {operation_name}")
@@ -810,8 +810,11 @@ def extract_osb_services_with_http_provider_id(project_path):
                                         st.success(f"elementos_xsd: {elementos_xsd}")
                                         #elementos_completos = list(elementos_xsd) + list(operations) + [operation_actual]
                                         osb_services.append(elementos_xsd)
-
-    
+                                    
+                                    else:
+                                        st.error("No se encuentra la operacion en el .jar")
+                                        return
+                                        
     st.success(f"osb_services: {osb_services}")
     return osb_services
 
@@ -842,7 +845,7 @@ def extraer_jar(archivo_jar):
         st.error(f"Error al extraer el .jar: {e}")
         return None
 
-def generar_documentacion(jar_path, plantilla_path):
+def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     """Función que ejecuta la generación de documentación."""
     
     # Extraer ruta del proyecto desde el .jar
@@ -862,7 +865,7 @@ def generar_documentacion(jar_path, plantilla_path):
     ruta_temporal = temp_dir.name  # Obtener la ruta temporal
     
     # Llamar a la función principal de tu script
-    services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir)
+    services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir,operacion_a_documentar)
     
     st.success(f"✅ services_with_data {services_with_data}")
     
@@ -1206,7 +1209,7 @@ def main():
     
     jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
     plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
-    #destino_path = st.text_input("Ruta donde se generarán los documentos")
+    operacion_a_documentar = st.text_input("Operacion")
     
     if jar_file:
         jar_path = "temp.jar"
@@ -1233,7 +1236,7 @@ def main():
     if st.button("Generar Documentación"):
         if jar_file and plantilla_file:
             with st.spinner("Generando documentación..."):
-                generar_documentacion(carpeta_destino, plantilla_file)
+                generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar)
         else:
             st.error("Por favor, sube todos los archivos y proporciona la ruta de destino.")
 
