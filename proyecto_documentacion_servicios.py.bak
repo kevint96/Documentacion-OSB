@@ -388,6 +388,15 @@ def extract_imports(root):
     
     return imports
 
+def get_correct_xsd_path(current_xsd_path, schema_location):
+    """
+    Corrige la ruta de un XSD importado considerando los niveles de directorio.
+    """
+    base_path = os.path.dirname(current_xsd_path)  # Obtener la carpeta del XSD actual
+    corrected_path = os.path.abspath(os.path.join(base_path, schema_location))  # Resolver la ruta correcta
+
+    return corrected_path
+
 def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual):
     request_elements = []
     response_elements = []
@@ -489,8 +498,10 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
                             if namespace in imports:
                                 schema_location = imports[namespace]
                                 st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
+                                corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
+                                st.success(f"corrected_xsd_path: {corrected_xsd_path}")
                                 new_xsd_path = os.path.join(extraccion_dir, os.path.normpath(schema_location.strip("/\\")))
-                                parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual)
+                                parse_xsd_file(project_path, corrected_xsd_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual)
                         else:
                             st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                     else:
