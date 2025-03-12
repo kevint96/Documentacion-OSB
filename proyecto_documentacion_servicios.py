@@ -357,11 +357,12 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     request_elements = []
     response_elements = []
     
-    # Obtener la ruta absoluta correcta dentro de la carpeta de extracción
-    extraccion_dir = os.path.abspath("extraccion_jar")
-    ruta_corregida = os.path.join(extraccion_dir, xsd_file_path)
-    
-    st.success(f"Archivos disponibles en {extraccion_dir}: {os.listdir(extraccion_dir)}")
+    # Asegurar que `xsd_file_path` no tenga "../" ni "/" inicial
+    xsd_file_path = os.path.normpath(xsd_file_path).lstrip(os.sep).replace("..", "")
+
+    # Construir la ruta final dentro de la carpeta de extracción
+    ruta_corregida = os.path.join(extraccion_dir, "ComponentesComunes", "Resources", "Schemas", "Servicios", "OperacionesComunesSiebelV2.1", os.path.basename(xsd_file_path))
+
 
 
     # Depuración para ver si la ruta corregida ahora es válida
