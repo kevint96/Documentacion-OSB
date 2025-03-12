@@ -361,15 +361,8 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     xsd_file_path = xsd_file_path.lstrip('/')
 
     # Crear ruta real con `extraccion_jar`
-    ruta_corregida = os.path.abspath(os.path.join(project_path, xsd_file_path))
+    ruta_corregida = os.path.abspath(os.path.join("extraccion_jar", os.path.normpath(xsd_file_path.lstrip('/'))))
 
-    # DEBUG: Verificar qué hay dentro de `ComponentesComunes`
-    ruta_resources = os.path.join(project_path, "ComponentesComunes", "Resources")
-    if os.path.exists(ruta_resources):
-        st.success(f"Contenido en Resources: {os.listdir(ruta_resources)}")
-    else:
-        st.error(f"No se encontró la carpeta: {ruta_resources}")
-        
     # Ruta esperada
     ruta_resources = os.path.join(project_path, "ComponentesComunes", "Resources")
 
@@ -382,8 +375,8 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     st.success(f"Nombre del archivo corregido: {ruta_corregida}")
     st.success(f"Existe archivo: {os.path.isfile(ruta_corregida)}")
     
-    archivos_xsd = glob.glob(os.path.join(project_path, "**/*.XMLSchema"), recursive=True)
-    st.success(f"Archivos encontrados en extraccion_jar: {archivos_xsd}")
+    #archivos_xsd = glob.glob(os.path.join(project_path, "**/*.XMLSchema"), recursive=True)
+    #st.success(f"Archivos encontrados en extraccion_jar: {archivos_xsd}")
 
 
     if xsd_file_path.endswith('.XMLSchema') and os.path.isfile(xsd_file_path):
