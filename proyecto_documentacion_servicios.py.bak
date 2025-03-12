@@ -471,15 +471,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url,
                     full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
                     st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
-                    # 🔹 Si element_type está vacío, revisar si hay una restricción con base
-                    if not element_type:
-                        simple_type = element.find("xs:simpleType", namespaces)
-                        if simple_type is not None:
-                            restriction = simple_type.find("xs:restriction", namespaces)
-                            if restriction is not None:
-                                element_type = restriction.attrib.get("base", "")
-                                st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
-
+                    # 🔹 Si element_type es primitivo (xsd:string, xs:int, etc.)
                     if element_type.startswith(("xsd:", "xs:")):
                         element_details = {
                             'elemento': parent_element_name,
@@ -498,9 +490,15 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url,
                         elif 'Response' in parent_element_name:
                             response_elements.append(element_details)
 
+                    # 🔹 Si element_type tiene prefijo (ej: entcab:RespuestaError)
                     elif ':' in element_type:
                         prefix, nested_type = element_type.split(':')
-                        if prefix in namespaces:
+                        
+                        # 🔹 Verificar si el complexType está en el mismo XSD antes de ir a otro
+                        if nested_type in complex_types:
+                            st.success(f"Buscando {nested_type} en el mismo XSD")
+                            explorar_complex_type(nested_type, full_name)  # Llamada recursiva
+                        elif prefix in namespaces:
                             namespace = namespaces[prefix]
                             if namespace in imports:
                                 schema_location = imports[namespace]
@@ -510,12 +508,11 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url,
                                 new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
                                 st.success(f"new_xsd_path: {new_xsd_path}")
 
-                                # Llamada recursiva buscando solo `nested_type`
+                                # 🔹 Llamada recursiva buscando SOLO `nested_type`
                                 parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
                                                capa_proyecto, operacion_business, operations, 
                                                service_name, operation_actual, target_complex_type=nested_type, 
                                                parent_element_name=full_name)
-
                         else:
                             st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                     else:
