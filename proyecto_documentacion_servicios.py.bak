@@ -1064,26 +1064,23 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
             print_with_line_number("___________________________________________")
             
 
-            nombre_documento = "Especificación Servicio WSDL " + operation + ".docx"
-            
-            doc_nuevo = replace_text_in_doc(doc, variables)
-            
-            #doc_nuevo = reemplazar_texto_en_doc(doc, variables)
-            
-            st.success(f"ruta_raiz: {ruta_raiz}")
-            
-            ruta_completa = os.path.join(ruta_raiz, ruta[1:], nombre_documento)
-            
-            st.success(f"ruta_completa: {ruta_completa}")
-            
-            # Verificar si el directorio existe, si no, crearlo
-            if not os.path.exists(os.path.dirname(ruta_completa)):
-                os.makedirs(os.path.dirname(ruta_completa))
+            # Guardar el documento en la carpeta del entorno de ejecución
+            ruta_guardado = f"Especificación Servicio WSDL {operation}.docx"
+            doc_nuevo.save(ruta_guardado)
 
+            st.success(f"Documento guardado en: {ruta_guardado}")
 
-            # Guardar el documento con los cambios
-            doc_nuevo.save(ruta_completa)
-    
+            # Permitir la descarga del archivo desde la app
+            with open(ruta_guardado, "rb") as file:
+                file_bytes = file.read()
+
+            st.download_button(
+                label="📥 Descargar Documento",
+                data=file_bytes,
+                file_name=ruta_guardado,
+                mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            )
+                
     st.success("Documentación generada con éxito!")
 
 def main():

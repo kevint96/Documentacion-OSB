@@ -1066,6 +1066,7 @@ def generar_documentacion(jar_path, plantilla_path, destino_path):
 
             # Guardar el documento en la carpeta del entorno de ejecución
             ruta_guardado = f"Especificación Servicio WSDL {operation}.docx"
+            doc_nuevo = replace_text_in_doc(doc, variables)
             doc_nuevo.save(ruta_guardado)
 
             st.success(f"Documento guardado en: {ruta_guardado}")
