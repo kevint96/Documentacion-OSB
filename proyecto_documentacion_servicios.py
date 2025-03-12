@@ -359,23 +359,18 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     
     # Obtener la ruta absoluta correcta dentro de la carpeta de extracción
     extraccion_dir = os.path.abspath(project_path)
-    # Asegurar que `xsd_file_path` no tenga "../" ni "/" inicial
-    xsd_file_path = os.path.normpath(xsd_file_path).lstrip(os.sep).replace("..", "")
-    # Obtener la carpeta donde está el archivo XSD dentro del ZIP extraído
+    # Limpiar `xsd_file_path` eliminando barras extra y normalizando la ruta
+    xsd_file_path = os.path.normpath(xsd_file_path.strip("/\\"))  # Elimina / y \ iniciales
     subcarpeta_xsd = os.path.dirname(xsd_file_path)  # Obtiene el path relativo dentro del ZIP
     
-    #/mount/src/documentacion-osb
-
     # Construir la ruta final dentro de la carpeta de extracción
     ruta_corregida = os.path.join(extraccion_dir, subcarpeta_xsd, os.path.basename(xsd_file_path))
 
-    st.success(f"extraccion_dir {extraccion_dir}")
-    st.success(f"xsd_file_path {xsd_file_path}")
-    st.success(f"subcarpeta_xsd {subcarpeta_xsd}")
+    # Depuración
+    st.success(f"extraccion_dir: {extraccion_dir}")
+    st.success(f"xsd_file_path limpio: {xsd_file_path}")
+    st.success(f"subcarpeta_xsd: {subcarpeta_xsd}")
     st.success(f"Archivos disponibles en {extraccion_dir}: {os.listdir(extraccion_dir)}")
-
-
-    # Depuración para ver si la ruta corregida ahora es válida
     st.success(f"Ruta corregida FINAL: {ruta_corregida}")
     st.success(f"¿El archivo existe?: {os.path.isfile(ruta_corregida)}")
     
