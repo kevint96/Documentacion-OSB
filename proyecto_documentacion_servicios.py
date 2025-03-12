@@ -516,10 +516,10 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     st.success(f"Agregando elemento primitivo: {element_details}")
                     if 'Request' in parent_element_name:
                         request_elements.append(element_details)
-                        st.success(f"request_elements: {len(request_elements)}")
+                        st.success(f"request_elements: {request_elements}")
                     elif 'Response' in parent_element_name:
                         response_elements.append(element_details)
-                        st.success(f"response_elements: {len(response_elements)}")
+                        st.success(f"response_elements: {response_elements}")
 
                 # ✅ Si es otro complexType dentro del mismo XSD
                 elif element_type in complex_types:
