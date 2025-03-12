@@ -357,23 +357,16 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     request_elements = []
     response_elements = []
     
-    # Asegurar que xsd_file_path no tenga '/mount/' ni '/' inicial
-    xsd_file_path = xsd_file_path.lstrip('/')
+    # Limpiar la ruta y evitar "../"
+    xsd_file_path = os.path.normpath(xsd_file_path)  # Elimina "../../../" innecesario
+    xsd_file_path = xsd_file_path.lstrip(os.sep)  # Elimina "/" inicial si existe
 
-    # Crear ruta real con `extraccion_jar`
-    ruta_corregida = os.path.join("extraccion_jar", xsd_file_path.lstrip('/'))
+    # Crear la ruta correcta sin /mount/
+    ruta_corregida = os.path.join("extraccion_jar", xsd_file_path)
 
-    # Ruta esperada
-    ruta_resources = os.path.join(project_path, "ComponentesComunes", "Resources")
-
-    if os.path.exists(ruta_resources):
-        st.success(f"Contenido en Resources: {os.listdir(ruta_resources)}")
-    else:
-        st.error(f"No se encontró la carpeta: {ruta_resources}")
-
-    # DEBUG: Mostrar ruta corregida y si el archivo existe
-    st.success(f"Nombre del archivo corregido: {ruta_corregida}")
-    st.success(f"Existe archivo: {os.path.isfile(ruta_corregida)}")
+    # Debug para verificar la ruta
+    st.success(f"Ruta corregida FINAL: {ruta_corregida}")
+    st.success(f"¿El archivo existe?: {os.path.isfile(ruta_corregida)}")
     
     #archivos_xsd = glob.glob(os.path.join(project_path, "**/*.XMLSchema"), recursive=True)
     #st.success(f"Archivos encontrados en extraccion_jar: {archivos_xsd}")
