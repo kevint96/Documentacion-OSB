@@ -402,7 +402,9 @@ def get_correct_xsd_path(current_xsd_path, schema_location):
 
     return corrected_path
 
-def parse_xsd_file(project_path, xsd_file_path, service_url, capa_proyecto, operacion_business, operations, service_name):
+def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, capa_proyecto, 
+                   operacion_business, operations, service_name, operation_actual, 
+                   target_complex_type=None, root_element_name=None):
     """
     Parsea un XSD y extrae los elementos request/response de forma recursiva.
     """
@@ -450,21 +452,29 @@ def parse_xsd_file(project_path, xsd_file_path, service_url, capa_proyecto, oper
     # ✅ Buscar los elementos principales del XSD (Request y Response)
     root_elements = {elem.attrib.get('name', ''): elem.attrib.get('type', '').split(':')[-1] for elem in root.findall(".//xs:element", namespaces)}
 
-    # 🔹 Recorrer cada `xs:element` encontrado en el XSD raíz
+    # 🚀 **Si `target_complex_type` está definido, buscar SOLO ese complexType.**
+    if target_complex_type:
+        st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
+        explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
+                              xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
+                              operations, service_name, operation_actual, request_elements, response_elements,operation_name)
+        return request_elements, response_elements
+
+    # 🔹 Si `target_complex_type` no está, procesamos TODO desde los elementos raíz.
     for root_element_name, complex_type in root_elements.items():
         st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
 
         if complex_type in complex_types:
             explorar_complex_type(complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                  operations, service_name, root_element_name, request_elements, response_elements)
+                                  operations, service_name, operation_actual, request_elements, response_elements,operation_name)
 
     return request_elements, response_elements
 
 
 def explorar_complex_type(type_name, parent_element_name, complex_types, namespaces, imports, extraccion_dir, 
                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                          operations, service_name, root_element_name, request_elements, response_elements):
+                          operations, service_name, operation_actual, request_elements, response_elements,operation_name):
     """Explora recursivamente un complexType y extrae sus elementos internos."""
 
     type_name = type_name.split(':')[-1]  
@@ -478,7 +488,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 element_name = element.attrib.get('name', '')
                 element_type = element.attrib.get('type', '')
 
-                full_name = f"{root_element_name}.{element_name}"  # 🔹 Mantiene el padre original
+                full_name = f"{parent_element_name}.{element_name}"  # 🔹 Mantiene el padre original
                 st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
                 simple_type = element.find('xs:simpleType', namespaces)
@@ -490,7 +500,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
 
                 if element_type.startswith(("xsd:", "xs:")):
                     element_details = {
-                        'elemento': root_element_name,  # 🚀 Se mantiene el elemento raíz original
+                        'elemento': parent_element_name,
                         'name': full_name,
                         'type': element_type,
                         'url': service_url,
@@ -498,12 +508,12 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         'business': operacion_business,
                         'operations': operations,
                         'service_name': service_name,
-                        'operation_actual': root_element_name,
+                        'operation_actual': operation_actual,
                     }
                     st.success(f"Agregando elemento primitivo: {element_details}")
-                    if 'Request' in root_element_name:
+                    if 'Request' in parent_element_name:
                         request_elements.append(element_details)
-                    elif 'Response' in root_element_name:
+                    elif 'Response' in parent_element_name:
                         response_elements.append(element_details)
 
                 elif ':' in element_type:
@@ -513,7 +523,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         st.success(f"Buscando {nested_type} en el mismo XSD")
                         explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                              operations, service_name, root_element_name, request_elements, response_elements)
+                                              operations, service_name, operation_actual, request_elements, response_elements,operation_name)
                     elif prefix in namespaces:
                         namespace = namespaces[prefix]
                         if namespace in imports:
@@ -522,18 +532,18 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                             corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
                             new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
 
-                            # ✅ Se envía `root_element_name` en todas las llamadas
-                            parse_xsd_file(project_path, new_xsd_path, service_url, 
+                            # ✅ Se envía `target_complex_type` en la recursión
+                            parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
                                            capa_proyecto, operacion_business, operations, 
-                                           service_name, root_element_name, 
-                                           target_complex_type=nested_type)
+                                           service_name, operation_actual, 
+                                           target_complex_type=nested_type, 
+                                           root_element_name=parent_element_name)
                     else:
                         st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                 else:
                     st.warning(f"complexType {element_type} no encontrado en el XSD")
     else:
         st.warning(f"complexType {type_name} no encontrado en el XSD")
-
 
 def leer_xsd_file(xsd_file_path, complexType_name):
     elements_list = []
