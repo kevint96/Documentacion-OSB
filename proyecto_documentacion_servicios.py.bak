@@ -352,11 +352,11 @@ def find_import_elements_with_namespace(xsd_content, target_namespace, xsd_file_
     
     return absolute_schema_location  # Esto devolverá None si no se encontró coincidencia "
 
-def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual):
+def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual):
     request_elements = []
     response_elements = []
     
-    ruta_corregida = os.path.abspath(os.path.normpath(xsd_file_path))
+    ruta_corregida = os.path.abspath(os.path.join(project_path, os.path.normpath(xsd_file_path)))
     
     st.success(f"Nombre del archivo: {ruta_corregida}")
     st.success(f"Existe archivo: {os.path.isfile(ruta_corregida)}")
@@ -692,7 +692,7 @@ def extract_osb_services_with_http_provider_id(project_path):
                                         #print_with_line_number("")
                                         #print_with_line_number("")
                                     
-                                        elementos_xsd = parse_xsd_file(xsd, operation_name,service_url,capa_proyecto,operacion_business,operations, service_name, operation_actual)
+                                        elementos_xsd = parse_xsd_file(project_path,xsd, operation_name,service_url,capa_proyecto,operacion_business,operations, service_name, operation_actual)
                                         st.success(f"elementos_xsd: {elementos_xsd}")
                                         #elementos_completos = list(elementos_xsd) + list(operations) + [operation_actual]
                                         osb_services.append(elementos_xsd)
