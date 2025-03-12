@@ -465,7 +465,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
         if target_complex_type in complex_types:
             explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                  operations, service_name, operation_actual, request_elements, response_elements)
+                                  operations, service_name, operation_actual, request_elements, response_elements,operation_name)
         return request_elements, response_elements
 
     # Si no hay un `target_complex_type`, analizamos todos los elementos
@@ -476,14 +476,14 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
         if element_type in complex_types:
             explorar_complex_type(element_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                  operations, service_name, operation_actual, request_elements, response_elements)
+                                  operations, service_name, operation_actual, request_elements, response_elements,operation_name)
 
     return request_elements, response_elements
 
 
 def explorar_complex_type(type_name, parent_element_name, complex_types, namespaces, imports, extraccion_dir, 
                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                          operations, service_name, operation_actual, request_elements, response_elements):
+                          operations, service_name, operation_actual, request_elements, response_elements,operation_name):
     """Explora recursivamente un complexType y extrae sus elementos internos."""
 
     type_name = type_name.split(':')[-1]  
@@ -534,7 +534,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         st.success(f"Buscando {nested_type} en el mismo XSD")
                         explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                              operations, service_name, operation_actual, request_elements, response_elements)
+                                              operations, service_name, operation_actual, request_elements, response_elements,operation_name)
                     elif prefix in namespaces:
                         namespace = namespaces[prefix]
                         if namespace in imports:
