@@ -353,6 +353,41 @@ def find_import_elements_with_namespace(xsd_content, target_namespace, xsd_file_
     
     return absolute_schema_location  # Esto devolverá None si no se encontró coincidencia "
 
+def extract_namespaces(xsd_content):
+    """Extrae los namespaces definidos en el XSD."""
+    namespaces = {}
+    matches = re.findall(r'xmlns:([\w]+)="([^"]+)"', xsd_content)
+    for prefix, uri in matches:
+        namespaces[prefix] = uri
+    return namespaces
+
+
+def extract_imports(root):
+    """Extrae los imports y los mapea con sus schemaLocation."""
+    # Detectar el prefijo correcto para XML Schema (puede ser xs: o xsd:)
+    schema_ns = "http://www.w3.org/2001/XMLSchema"
+    prefix = None
+    
+    # Buscar en los atributos del root el namespace correspondiente
+    for attr in root.attrib:
+        if root.attrib[attr] == schema_ns:
+            prefix = attr.split(":")[-1]  # Extraer el prefijo después de "xmlns:"
+            break
+    
+    # Si no se encontró prefijo, usar xs por defecto
+    if not prefix:
+        prefix = "xs"
+
+    # Buscar los imports con el prefijo detectado
+    imports = {}
+    for imp in root.findall(f".//{prefix}:import", {prefix: schema_ns}):
+        namespace = imp.attrib.get('namespace')
+        schema_location = imp.attrib.get('schemaLocation')
+        if namespace and schema_location:
+            imports[namespace] = schema_location
+    
+    return imports
+
 def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual):
     request_elements = []
     response_elements = []
@@ -382,86 +417,95 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     xsd_file_path = ruta_corregida
 
 
-    if xsd_file_path.endswith('.XMLSchema') and os.path.isfile(xsd_file_path):
-        with open(xsd_file_path, 'r', encoding="utf-8") as f:
-            xsd_content = f.read()
-            
-            # Extraer el contenido real del CDATA si está presente
-            cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', xsd_content, re.DOTALL)
-            if cdata_match:
-                xsd_content = cdata_match.group(1)
-                st.success("Se ha extraído el contenido de CDATA correctamente")
-            
-            try:
-                root = ET.fromstring(xsd_content)
-            except ET.ParseError as e:
-                st.error(f"Error al analizar el XMLSchema: {e}")
-                return request_elements, response_elements
-            
-            namespaces = {'xsd': 'http://www.w3.org/2001/XMLSchema'}
-            
-            st.success(f"Procesando XSD: {xsd_file_path}")
-            
-            # Obtener todos los complexTypes en un diccionario
-            complex_types = {elem.attrib.get('name', None): elem for elem in root.findall(".//xsd:complexType", namespaces) if 'name' in elem.attrib}
-            st.success(f"ComplexTypes encontrados: {list(complex_types.keys())}")
+    if not os.path.isfile(ruta_corregida):
+        st.error(f"El archivo XSD {ruta_corregida} no existe.")
+        return request_elements, response_elements
 
-            # Obtener los elementos principales del esquema
-            elements = root.findall(".//xsd:element", namespaces)
-            
-            if not elements:
-                st.warning("No se encontraron elementos principales en el XSD.")
+    # Leer el contenido del XSD
+    with open(ruta_corregida, 'r', encoding="utf-8") as f:
+        xsd_content = f.read()
 
-            # Explorar un complexType
-            def explorar_complex_type(type_name, parent_element_name):
-                """Explora recursivamente un complexType y extrae sus elementos internos."""
-                type_name = type_name.split(':')[-1]  # Remover prefijo si existe
-                
-                if type_name in complex_types:
-                    st.success(f"Explorando complexType: {type_name}")
-                    sequence = complex_types[type_name].find('xsd:sequence', namespaces)
-                    if sequence is not None:
-                        for element in sequence.findall('xsd:element', namespaces):
-                            element_name = element.attrib.get('name', '')
-                            element_type = element.attrib.get('type', '')
+    # Extraer el contenido real del CDATA si está presente
+    cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', xsd_content, re.DOTALL)
+    if cdata_match:
+        xsd_content = cdata_match.group(1)
+        st.success("Se ha extraído el contenido de CDATA correctamente")
+    
+    try:
+        root = ET.fromstring(xsd_content)
+    except ET.ParseError as e:
+        st.error(f"Error al analizar el XMLSchema: {e}")
+        return request_elements, response_elements
+    
+    namespaces = extract_namespaces(xsd_content)  # Extraer todos los namespaces
+    imports = extract_imports(root)  # Extraer imports y schemaLocation
+    
+    st.success(f"Namespaces detectados: {namespaces}")
+    st.success(f"Imports encontrados: {imports}")
 
-                            full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-                            st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
+    # Obtener todos los complexTypes en un diccionario
+    complex_types = {elem.attrib.get('name', None): elem for elem in root.findall(".//xs:complexType", namespaces) if 'name' in elem.attrib}
+    st.success(f"ComplexTypes encontrados: {list(complex_types.keys())}")
 
-                            if element_type.startswith(("xsd:", "xs:")):
-                                element_details = {
-                                    'elemento': parent_element_name,  # Ahora tomamos el elemento raíz
-                                    'name': full_name,
-                                    'type': element_type,
-                                    'url': service_url,
-                                    'ruta': capa_proyecto,
-                                    'business': operacion_business,
-                                    'operations': operations,
-                                    'service_name': service_name,
-                                    'operation_actual': operation_actual,
-                                }
-                                st.success(f"Agregando elemento primitivo: {element_details}")
-                                if 'Request' in parent_element_name:
-                                    request_elements.append(element_details)
-                                elif 'Response' in parent_element_name:
-                                    response_elements.append(element_details)
-                            elif ':' in element_type or element_type in complex_types:
-                                nested_type = element_type.split(':')[-1]
-                                st.success(f"Elemento {full_name} tiene complexType anidado: {nested_type}")
-                                explorar_complex_type(nested_type, full_name)
-                            else:
-                                st.warning(f"complexType {element_type} no encontrado en el XSD")
-                else:
-                    st.warning(f"complexType {type_name} no encontrado en el XSD")
+    elements = root.findall(".//xs:element", namespaces)
+    
+    # Explorar un complexType
+    def explorar_complex_type(type_name, parent_element_name):
+        """Explora recursivamente un complexType y extrae sus elementos internos."""
+        type_name = type_name.split(':')[-1]  # Remover prefijo si existe
+        
+        if type_name in complex_types:
+            st.success(f"Explorando complexType: {type_name}")
+            sequence = complex_types[type_name].find('xs:sequence', namespaces)
+            if sequence is not None:
+                for element in sequence.findall('xs:element', namespaces):
+                    element_name = element.attrib.get('name', '')
+                    element_type = element.attrib.get('type', '')
 
-            # Iterar sobre los elementos principales del XSD
-            for element in elements:
-                element_name = element.attrib.get('name', '')
-                element_type = element.attrib.get('type', '').split(':')[-1]
+                    full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
+                    st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
-                if element_type in complex_types:
-                    st.success(f"Iniciando exploración en {element_name} -> {element_type}")
-                    explorar_complex_type(element_type, element_name)  # Pasamos el nombre del xsd:element
+                    if element_type.startswith(("xsd:", "xs:")):
+                        element_details = {
+                            'elemento': parent_element_name,
+                            'name': full_name,
+                            'type': element_type,
+                            'url': service_url,
+                            'ruta': capa_proyecto,
+                            'business': operacion_business,
+                            'operations': operations,
+                            'service_name': service_name,
+                            'operation_actual': operation_actual,
+                        }
+                        st.success(f"Agregando elemento primitivo: {element_details}")
+                        if 'Request' in parent_element_name:
+                            request_elements.append(element_details)
+                        elif 'Response' in parent_element_name:
+                            response_elements.append(element_details)
+                    elif ':' in element_type:
+                        prefix, nested_type = element_type.split(':')
+                        if prefix in namespaces:
+                            namespace = namespaces[prefix]
+                            if namespace in imports:
+                                schema_location = imports[namespace]
+                                st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
+                                new_xsd_path = os.path.join(extraccion_dir, os.path.normpath(schema_location.strip("/\\")))
+                                parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual)
+                        else:
+                            st.warning(f"No se encontró el namespace para el prefijo {prefix}")
+                    else:
+                        st.warning(f"complexType {element_type} no encontrado en el XSD")
+        else:
+            st.warning(f"complexType {type_name} no encontrado en el XSD")
+
+    # Iterar sobre los elementos principales del XSD
+    for element in elements:
+        element_name = element.attrib.get('name', '')
+        element_type = element.attrib.get('type', '').split(':')[-1]
+
+        if element_type in complex_types:
+            st.success(f"Iniciando exploración en {element_name} -> {element_type}")
+            explorar_complex_type(element_type, element_name)  
 
     st.success(f"Total elementos request: {len(request_elements)}")
     st.success(f"Total elementos response: {len(response_elements)}")
