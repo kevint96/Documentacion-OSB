@@ -391,16 +391,13 @@ def extract_imports(root):
 def get_correct_xsd_path(current_xsd_path, schema_location):
     """
     Corrige la ruta de un XSD importado considerando los niveles de directorio.
-    Devuelve una ruta relativa correcta sin duplicar directorios.
     """
-    base_path = os.path.dirname(current_xsd_path)  # Carpeta del XSD actual
-    corrected_path = os.path.normpath(os.path.join(base_path, schema_location))  # Resolver la ruta correcta
+    base_path = os.path.dirname(current_xsd_path)  # Obtener la carpeta del XSD actual
+    st.success(f"base_path: {base_path}")
+    corrected_path = os.path.abspath(os.path.join(base_path, schema_location))
+    st.success(f"corrected_path: {corrected_path}")    # Resolver la ruta correcta
 
-    # Eliminar cualquier prefijo absoluto innecesario
-    if corrected_path.startswith(os.sep):
-        corrected_path = corrected_path.lstrip(os.sep)
-
-    return corrected_path  # Devolver ruta relativa correcta
+    return corrected_path
 
 def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual):
     request_elements = []
