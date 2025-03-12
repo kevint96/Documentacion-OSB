@@ -355,6 +355,10 @@ def find_import_elements_with_namespace(xsd_content, target_namespace, xsd_file_
 def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual):
     request_elements = []
     response_elements = []
+    
+    st.success(f"Nombre del archivo: {xsd_file_path}")
+    st.success(f"Existe archivo: {os.path.isfile(xsd_file_path)}")
+    st.success(f"Contenido del directorio: {os.listdir(os.path.dirname(xsd_file_path))}")
 
     if xsd_file_path.endswith('.XMLSchema') and os.path.isfile(xsd_file_path):
         with open(xsd_file_path, 'r', encoding="utf-8") as f:

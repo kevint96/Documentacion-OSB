@@ -356,9 +356,10 @@ def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, op
     request_elements = []
     response_elements = []
     
-    st.success(f"Nombre del archivo: {xsd_file_path}")
-    st.success(f"Existe archivo: {os.path.isfile(xsd_file_path)}")
-    st.success(f"Contenido del directorio: {os.listdir(os.path.dirname(xsd_file_path))}")
+    ruta_corregida = os.path.abspath(os.path.normpath(xsd_file_path))
+    
+    st.success(f"Nombre del archivo: {ruta_corregida}")
+    st.success(f"Existe archivo: {os.path.isfile(ruta_corregida)}")
 
     if xsd_file_path.endswith('.XMLSchema') and os.path.isfile(xsd_file_path):
         with open(xsd_file_path, 'r', encoding="utf-8") as f:
