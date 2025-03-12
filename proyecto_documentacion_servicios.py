@@ -357,15 +357,12 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     request_elements = []
     response_elements = []
     
-    # Asegurar que xsd_file_path no tenga '/mount/' ni '../'
-    xsd_file_path = os.path.normpath(xsd_file_path)  # Normaliza la ruta
-    xsd_file_path = xsd_file_path.lstrip(os.sep).replace("..", "")  # Elimina "../"
+    # Obtener la ruta absoluta correcta dentro de la carpeta de extracción
+    extraccion_dir = os.path.abspath("extraccion_jar")
+    ruta_corregida = os.path.join(extraccion_dir, xsd_file_path)
+    
+    st.success(f"Archivos disponibles en {extraccion_dir}: {os.listdir(extraccion_dir)}")
 
-    # Construir la ruta final dentro de 'extraccion_jar'
-    ruta_corregida = os.path.join("extraccion_jar", xsd_file_path)  # NO usar `abspath`
-
-    # Depuración para ver el contenido dentro de 'extraccion_jar'
-    st.success(f"Archivos disponibles en extraccion_jar: {os.listdir('extraccion_jar')}")
 
     # Depuración para ver si la ruta corregida ahora es válida
     st.success(f"Ruta corregida FINAL: {ruta_corregida}")

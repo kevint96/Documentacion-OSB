@@ -362,9 +362,12 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     xsd_file_path = xsd_file_path.lstrip(os.sep).replace("..", "")  # Elimina "../"
 
     # Construir la ruta final dentro de 'extraccion_jar'
-    ruta_corregida = os.path.abspath(os.path.join("extraccion_jar", xsd_file_path))
+    ruta_corregida = os.path.join("extraccion_jar", xsd_file_path)  # NO usar `abspath`
 
-    # Debug para verificar la ruta
+    # Depuración para ver el contenido dentro de 'extraccion_jar'
+    st.success(f"Archivos disponibles en extraccion_jar: {os.listdir('extraccion_jar')}")
+
+    # Depuración para ver si la ruta corregida ahora es válida
     st.success(f"Ruta corregida FINAL: {ruta_corregida}")
     st.success(f"¿El archivo existe?: {os.path.isfile(ruta_corregida)}")
     
