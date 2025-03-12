@@ -794,6 +794,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                 for operation_name, xsd in operation_to_xsd.items():
                                     #print_with_line_number("")
                                     operation_actual = operation_name
+                                    st.success(f"operacion_a_documentar: {operacion_a_documentar}")
                                     if (operation_name == operacion_a_documentar or operacion_a_documentar is None):
                                         st.success(f"operation_actual: {operation_actual}")
                                         st.success(f"service_name: {service_name}")

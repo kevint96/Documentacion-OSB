@@ -812,7 +812,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                         osb_services.append(elementos_xsd)
                                     
                                     else:
-                                        st.error("No se encuentra la operacion en el .jar")
+                                        st.error("⛔ No se encuentra la operacion en el .jar ⛔")
                                         return
                                         
     st.success(f"osb_services: {osb_services}")
