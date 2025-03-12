@@ -642,8 +642,6 @@ def extract_osb_services_with_http_provider_id(project_path):
                                         if operation.lower() in os.path.basename(xsd).lower():
                                             operation_to_xsd[operation] = xsd
                                             break
-                                        else:
-                                            operation_to_xsd[operation] = xsd
                                         
                                 
                                 st.success(f"operation_to_xsd: {operation_to_xsd}")
