@@ -447,7 +447,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     st.success(f"Namespaces detectados: {namespaces}")
     st.success(f"Imports encontrados: {imports}")
 
-    # 🔹 **Obtener elementos raíz SOLO en el primer XSD analizado**
+    # Obtener elementos raíz SOLO en el primer XSD analizado
     if root_element_name is None:
         root_elements = [elem.attrib.get('name', '') for elem in root.findall(".//xs:element", namespaces)]
         root_element_name = root_elements[0] if root_elements else operation_actual
@@ -459,7 +459,9 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     # Si tenemos un `target_complex_type`, exploramos solo ese
     if target_complex_type:
         if target_complex_type in complex_types:
-            explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, xsd_file_path, project_path)
+            explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
+                                  xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
+                                  operations, service_name, operation_actual, request_elements, response_elements)
         return request_elements, response_elements
 
     # Si no hay un `target_complex_type`, analizamos todos los elementos
@@ -468,12 +470,16 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
         element_type = element.attrib.get('type', '').split(':')[-1]
 
         if element_type in complex_types:
-            explorar_complex_type(element_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, xsd_file_path, project_path)
+            explorar_complex_type(element_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
+                                  xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
+                                  operations, service_name, operation_actual, request_elements, response_elements)
 
     return request_elements, response_elements
 
 
-def explorar_complex_type(type_name, parent_element_name, complex_types, namespaces, imports, extraccion_dir, xsd_file_path, project_path):
+def explorar_complex_type(type_name, parent_element_name, complex_types, namespaces, imports, extraccion_dir, 
+                          xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
+                          operations, service_name, operation_actual, request_elements, response_elements):
     """Explora recursivamente un complexType y extrae sus elementos internos."""
 
     type_name = type_name.split(':')[-1]  
@@ -497,7 +503,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         element_type = restriction.attrib['base']
                         st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
 
-                root_element = parent_element_name  # 🔹 Siempre mantenemos el primer elemento raíz
+                root_element = parent_element_name  # 🔹 Mantiene el elemento raíz original
 
                 if element_type.startswith(("xsd:", "xs:")):
                     element_details = {
@@ -522,7 +528,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     
                     if nested_type in complex_types:
                         st.success(f"Buscando {nested_type} en el mismo XSD")
-                        explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, xsd_file_path, project_path)
+                        explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
+                                              xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
+                                              operations, service_name, operation_actual, request_elements, response_elements)
                     elif prefix in namespaces:
                         namespace = namespaces[prefix]
                         if namespace in imports:

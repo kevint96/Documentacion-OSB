@@ -408,7 +408,6 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     """
     Parsea un XSD y extrae los elementos request/response de forma recursiva.
     """
-
     request_elements = []
     response_elements = []
 
@@ -447,11 +446,16 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     st.success(f"Namespaces detectados: {namespaces}")
     st.success(f"Imports encontrados: {imports}")
 
-    # Obtener elementos raíz SOLO en el primer XSD analizado
+    # ✅ Tomar el elemento raíz del primer XSD procesado
     if root_element_name is None:
         root_elements = [elem.attrib.get('name', '') for elem in root.findall(".//xs:element", namespaces)]
         root_element_name = root_elements[0] if root_elements else operation_actual
         st.success(f"Elemento raíz detectado: {root_element_name}")
+
+    # ✅ Asegurar que `operation_name` se mantiene en TODAS las llamadas recursivas
+    if operation_name is None:
+        operation_name = root_element_name
+        st.success(f"Asignando operation_name desde root_element_name: {operation_name}")
 
     # Obtener todos los complexTypes
     complex_types = {elem.attrib.get('name', None): elem for elem in root.findall(".//xs:complexType", namespaces) if 'name' in elem.attrib}
@@ -539,6 +543,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                             corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
                             new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
 
+                            # ✅ SE AGREGA `operation_name` PARA EVITAR ERRORES
                             parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
                                            capa_proyecto, operacion_business, operations, 
                                            service_name, operation_actual, 
