@@ -700,7 +700,7 @@ def extract_osb_services_with_http_provider_id(project_path):
                                 # Iterar sobre el diccionario y realizar la llamada a parse_xsd_file
                                 for operation_name, xsd in operation_to_xsd.items():
                                     #print_with_line_number("")
-                                    if True:
+                                    if operation_name == 'consultarProductoRequiereFirmaV21':
                                         operation_actual = operation_name
                                         st.success(f"operation_actual: {operation_actual}")
                                         st.success(f"service_name: {service_name}")
