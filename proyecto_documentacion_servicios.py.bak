@@ -428,7 +428,7 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
                             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
                             st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
-                            if element_type.startswith("xsd:"):
+                            if element_type.startswith(("xsd:", "xs:")):
                                 element_details = {
                                     'elemento': parent_element_name,  # Ahora tomamos el elemento raíz
                                     'name': full_name,
