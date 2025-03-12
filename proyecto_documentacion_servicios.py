@@ -501,7 +501,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
 
                 if element_type.startswith(("xsd:", "xs:")):
                     element_details = {
-                        'elemento': parent_element_name,  # 🔥 **Mantener solo el padre original**
+                        'elemento': parent_element_name.split('.')[0],  # 🔥 **Mantener solo el padre original**
                         'name': full_name,  # 🔥 **Asegurar que incluya el contexto anterior**
                         'type': element_type,
                         'url': service_url,
