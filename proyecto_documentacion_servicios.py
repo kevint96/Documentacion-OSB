@@ -1090,8 +1090,8 @@ def generar_documentacion(jar_path, plantilla_path):
             zip_path = zip_buffer.name  # Obtener la ruta del archivo ZIP
 
             with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-                for doc_path in documentos_generados:
-                    zipf.write(doc_path, os.path.basename(doc_path))  # Agregar cada archivo al ZIP
+                for doc_path, zip_relative_path in documentos_generados:
+                    zipf.write(doc_path, zip_relative_path)  # Mantener la estructura dentro del ZIP
 
             st.success(f"ZIP creado: {zip_path}")
 
