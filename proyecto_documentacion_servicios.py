@@ -361,14 +361,17 @@ def parse_xsd_file(project_path,xsd_file_path, operation_name, service_url, capa
     extraccion_dir = os.path.abspath(project_path)
     # Asegurar que `xsd_file_path` no tenga "../" ni "/" inicial
     xsd_file_path = os.path.normpath(xsd_file_path).lstrip(os.sep).replace("..", "")
+    # Obtener la carpeta donde está el archivo XSD dentro del ZIP extraído
+    subcarpeta_xsd = os.path.dirname(xsd_file_path)  # Obtiene el path relativo dentro del ZIP
     
     #/mount/src/documentacion-osb
 
     # Construir la ruta final dentro de la carpeta de extracción
-    ruta_corregida = os.path.join(extraccion_dir, "ComponentesComunes", "Resources", "Schemas", "Servicios", "OperacionesComunesSiebelV2.1", os.path.basename(xsd_file_path))
+    ruta_corregida = os.path.join(extraccion_dir, subcarpeta_xsd, os.path.basename(xsd_file_path))
 
     st.success(f"extraccion_dir {extraccion_dir}")
     st.success(f"xsd_file_path {xsd_file_path}")
+    st.success(f"subcarpeta_xsd {subcarpeta_xsd}")
     st.success(f"Archivos disponibles en {extraccion_dir}: {os.listdir(extraccion_dir)}")
 
 
