@@ -795,7 +795,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                     #print_with_line_number("")
                                     operation_actual = operation_name
                                     st.success(f"operacion_a_documentar: {operacion_a_documentar}")
-                                    if (operation_name == operacion_a_documentar or operacion_a_documentar is None):
+                                    if not operacion_a_documentar or operation_name == operacion_a_documentar:
                                         st.success(f"operation_actual: {operation_actual}")
                                         st.success(f"service_name: {service_name}")
                                         st.success(f"operation_name: {operation_name}")
