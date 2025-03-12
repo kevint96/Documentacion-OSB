@@ -474,7 +474,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
 def explorar_complex_type(type_name, parent_element_name, complex_types, namespaces, imports, extraccion_dir, 
                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                          operations, service_name, operation_actual, request_elements, response_elements,operation_name):
+                          operations, service_name, operation_actual, request_elements, response_elements, operation_name):
     """Explora recursivamente un complexType y extrae sus elementos internos."""
 
     type_name = type_name.split(':')[-1]  
@@ -488,8 +488,10 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 element_name = element.attrib.get('name', '')
                 element_type = element.attrib.get('type', '')
 
-                # 🔹 **Asegurar que `parent_element_name` se mantenga para preservar la jerarquía**
+                # 🔹 **Mantener `parent_element_name` solo con el elemento raíz**
                 full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
+                root_element = parent_element_name  # 🔥 **Mantener el elemento raíz sin cambios**
+
                 st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
                 simple_type = element.find('xs:simpleType', namespaces)
@@ -501,8 +503,8 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
 
                 if element_type.startswith(("xsd:", "xs:")):
                     element_details = {
-                        'elemento': parent_element_name,
-                        'name': full_name,
+                        'elemento': root_element,   # 🔥 **Mantener solo el padre original**
+                        'name': full_name,         # 🔥 **Concatenar correctamente para jerarquía**
                         'type': element_type,
                         'url': service_url,
                         'ruta': capa_proyecto,
@@ -512,26 +514,26 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         'operation_actual': operation_actual,
                     }
                     st.success(f"Agregando elemento primitivo: {element_details}")
-                    if 'Request' in parent_element_name:
+                    if 'Request' in root_element:
                         request_elements.append(element_details)
-                    elif 'Response' in parent_element_name:
+                    elif 'Response' in root_element:
                         response_elements.append(element_details)
-                        
+
                 # ✅ Si es otro complexType dentro del mismo XSD
                 elif element_type in complex_types:
                     st.success(f"Buscando {element_type} en el mismo XSD")
-                    explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
+                    explorar_complex_type(element_type, root_element, complex_types, namespaces, imports, extraccion_dir, 
                                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                          operations, service_name, operation_actual, request_elements, response_elements,operation_name)
+                                          operations, service_name, operation_actual, request_elements, response_elements, operation_name)
 
                 elif ':' in element_type:
                     prefix, nested_type = element_type.split(':')
                     
                     if nested_type in complex_types:
                         st.success(f"Buscando {nested_type} en el mismo XSD")
-                        explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
+                        explorar_complex_type(nested_type, root_element, complex_types, namespaces, imports, extraccion_dir, 
                                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                              operations, service_name, operation_actual, request_elements, response_elements,operation_name)
+                                              operations, service_name, operation_actual, request_elements, response_elements, operation_name)
                     elif prefix in namespaces:
                         namespace = namespaces[prefix]
                         if namespace in imports:
@@ -540,16 +542,15 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                             corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
                             new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
 
-                            # ✅ Se envía `target_complex_type` en la recursión
                             parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
                                            capa_proyecto, operacion_business, operations, 
                                            service_name, operation_actual, 
                                            target_complex_type=nested_type, 
-                                           root_element_name=full_name)
+                                           root_element_name=root_element)  # 🔥 **Mantener el padre original**
+                        else:
+                            st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                     else:
-                        st.warning(f"No se encontró el namespace para el prefijo {prefix}")
-                else:
-                    st.warning(f"complexType {element_type} no encontrado en el XSD")
+                        st.warning(f"complexType {element_type} no encontrado en el XSD")
     else:
         st.warning(f"complexType {type_name} no encontrado en el XSD")
 
