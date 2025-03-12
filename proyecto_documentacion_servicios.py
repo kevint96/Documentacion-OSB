@@ -701,7 +701,7 @@ def extract_osb_services_with_http_provider_id(project_path):
                                 for operation_name, xsd in operation_to_xsd.items():
                                     #print_with_line_number("")
                                     operation_actual = operation_name
-                                    if operation_name == 'consultarProductoRequiereFirmaV21':
+                                    if operation_name != 'consultarProductoRequiereFirmaV21':
                                         st.success(f"operation_actual: {operation_actual}")
                                         st.success(f"service_name: {service_name}")
                                         st.success(f"operation_name: {operation_name}")
