@@ -1072,6 +1072,7 @@ def generar_documentacion(jar_path, plantilla_path):
 
 
             ruta_guardado = os.path.join(ruta_temporal, f"Especificación Servicio WSDL {operation}.docx")
+            doc_nuevo = replace_text_in_doc(doc, variables)
             doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
                 
             documentos_generados.append(ruta_guardado)  # Agregar a la lista
