@@ -872,7 +872,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
 
     # 📌 Definir la ruta del directorio temporal correctamente
     temp_dir = os.path.join(tempfile.gettempdir(), "documentacion_osb")
-    ruta_temporal = temp_dir.name  # Obtener la ruta temporal
+    ruta_temporal = temp_dir  # Obtener la ruta temporal
 
     if not isinstance(temp_dir, str) or not temp_dir:
         st.error("⛔ Error: La ruta temporal no es válida.")

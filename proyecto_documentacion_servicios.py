@@ -763,9 +763,9 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
             for file in files:
                 if file.endswith('.ProxyService'):
                     osb_file_path = os.path.join(root, file)
-                    ##st.success(f"✅ osb_file_path {osb_file_path}")
+                    st.success(f"✅ osb_file_path {osb_file_path}")
                     project_name = extract_project_name_from_proxy(osb_file_path)
-                    ##st.success(f"✅ project_name {project_name}")
+                    st.success(f"✅ project_name {project_name}")
                     if project_name is None:
                         continue 
                     pipeline_path = extract_pipeline_path_from_proxy(osb_file_path, project_path)
@@ -836,12 +836,12 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                         #st.success(f"operation_actual: {operation_actual}")
                                         #st.success(f"operacion_a_documentar: {operacion_a_documentar}")
                                         if not operacion_a_documentar or operation_name == operacion_a_documentar:
-                                            #st.success(f"operation_actual: {operation_actual}")
+                                            st.success(f"operation_actual: {operation_actual}")
                                             #st.success(f"service_name: {service_name}")
-                                            #st.success(f"operation_name: {operation_name}")
+                                            st.success(f"operation_name: {operation_name}")
                                             #st.success(f"xsd: {xsd}")
                                             #st.success(f"service_url: {service_url}")
-                                            #st.success(f"capa_proyecto: {capa_proyecto}")
+                                            st.success(f"capa_proyecto: {capa_proyecto}")
                                             #st.success(f"operacion_business: {operacion_business}")
                                             xsd = os.path.splitext(xsd)[0] + ".XMLSchema"
                                             #print_with_line_number("")
