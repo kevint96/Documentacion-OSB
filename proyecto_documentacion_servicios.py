@@ -495,7 +495,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
 
     type_name = type_name.split(':')[-1]  
 
-        if type_name in complex_types:
+    if type_name in complex_types:
         st.success(f"Explorando complexType: {type_name}")
 
         # 🔹 Buscar 'sequence' con ambos prefijos
