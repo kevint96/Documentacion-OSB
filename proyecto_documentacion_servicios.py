@@ -451,11 +451,20 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     st.success(f"Namespaces detectados: {namespaces}")
     st.success(f"Imports encontrados: {imports}")
 
-    # 🔍 Buscar complexTypes con ambos prefijos (xs y xsd)
+    # 🔹 Verificar qué prefijos están en el namespaces
+    valid_prefixes = [p for p in ['xs', 'xsd'] if p in namespaces]
+
+    if not valid_prefixes:
+        st.error("⛔ No se encontró un prefijo válido en los namespaces del XSD")
+        return request_elements, response_elements  # Salir si no hay prefijos válidos
+
+    # 🔹 Tomar el primer prefijo encontrado en namespaces (xs o xsd)
+    prefix = valid_prefixes[0]
+
+    # 🔹 Buscar complexTypes con el prefijo detectado dinámicamente
     complex_types = {
-        elem.attrib.get('name', None): elem 
-        for prefix in ['xs', 'xsd']  # Iterar sobre ambos posibles prefijos
-        for elem in root.findall(f".//{prefix}:complexType", namespaces) 
+        elem.attrib.get('name', None): elem
+        for elem in root.findall(f".//{prefix}:complexType", namespaces)
         if 'name' in elem.attrib
     }
 
