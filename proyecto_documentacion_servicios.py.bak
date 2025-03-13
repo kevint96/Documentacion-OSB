@@ -885,6 +885,8 @@ def extraer_jar(archivo_jar):
 def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     """Función que ejecuta la generación de documentación."""
     
+    zip_files = []
+    
     # Extraer ruta del proyecto desde el .jar
     jdeveloper_projects_dir = jar_path
     
@@ -1230,28 +1232,32 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 documentos_generados.append((ruta_guardado, os.path.join(ruta_proyecto, nombre_documento)))
                 st.success(f"Documento guardado: {ruta_guardado}")
 
-                # Crear el archivo ZIP en memoria
+                # Procesar y generar cada ZIP
                 zip_buffer = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
-                zip_path = zip_buffer.name  # Obtener la ruta del archivo ZIP
-
+                zip_path = zip_buffer.name
+    
                 with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
                     for doc_path, zip_relative_path in documentos_generados:
-                        zipf.write(doc_path, zip_relative_path)  # Mantener la estructura dentro del ZIP
+                        zipf.write(doc_path, zip_relative_path)
 
                 st.success(f"ZIP creado: {zip_path}")
 
                 # Permitir la descarga del ZIP desde Streamlit
                 with open(zip_path, "rb") as file:
-                    zip_bytes = file.read()
-
-                st.download_button(
-                    label="📥 Descargar TODOS los documentos en ZIP",
-                    data=zip_bytes,
-                    file_name="Documentos_OSB.zip",
-                    mime="application/zip"
-                )
+                    zip_files.append(file.read())
                     
-        #st.success("Documentación generada con éxito!")
+        # 🔹 Crear un solo botón para descargar todo en un solo ZIP
+        if zip_files:
+            combined_zip = b"".join(zip_files)
+            st.download_button(
+                label="📥 Descargar TODOS los documentos en ZIP",
+                data=combined_zip,
+                file_name="Documentos_Completos.zip",
+                mime="application/zip",
+                key="download_all"
+            )
+        st.success("Documentación generada con éxito!")
+        
 
 def main():
     st.title("📄 Generador de Documentación OSB")
