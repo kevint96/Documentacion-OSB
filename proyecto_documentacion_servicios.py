@@ -425,7 +425,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     ruta_corregida = os.path.join(extraccion_dir, subcarpeta_xsd, os.path.basename(xsd_file_path))
     
-    #st.success(f"Ruta corregida FINAL: {ruta_corregida}")
+    st.success(f"Ruta corregida FINAL: {ruta_corregida}")
     
     if not os.path.isfile(ruta_corregida):
         st.error(f"El archivo XSD {ruta_corregida} no existe.")
@@ -439,7 +439,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', xsd_content, re.DOTALL)
     if cdata_match:
         xsd_content = cdata_match.group(1)
-        #st.success("Se ha extraído el contenido de CDATA correctamente")
+        st.success("Se ha extraído el contenido de CDATA correctamente")
 
     try:
         root = ET.fromstring(xsd_content)
@@ -450,8 +450,8 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     namespaces = extract_namespaces(xsd_content)
     imports = extract_imports(root)
 
-    #st.success(f"Namespaces detectados: {namespaces}")
-    #st.success(f"Imports encontrados: {imports}")
+    st.success(f"Namespaces detectados: {namespaces}")
+    st.success(f"Imports encontrados: {imports}")
 
     # 🔹 Verificar qué prefijos están en el namespaces
     valid_prefixes = [p for p in ['xs', 'xsd'] if p in namespaces]
@@ -462,7 +462,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🔹 Tomar el primer prefijo encontrado en namespaces (xs o xsd)
     prefix = valid_prefixes[0]
-    #st.success(f"prefix: {prefix}")
+    st.success(f"prefix: {prefix}")
 
     # 🔹 Buscar complexTypes con el prefijo detectado dinámicamente
     complex_types = {
@@ -479,7 +479,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🚀 **Si `target_complex_type` está definido, buscar SOLO ese complexType.**
     if target_complex_type:
-        #st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
+        st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
         explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                               operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -487,15 +487,15 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🔹 Si `target_complex_type` no está, procesamos TODO desde los elementos raíz.
     for root_element_name, complex_type in root_elements.items():
-        #st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
+        st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
 
         if complex_type in complex_types:
             explorar_complex_type(complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                   operations, service_name, operation_actual, request_elements, response_elements, operation_name)
 
-    #st.success(f"Total elementos request: {len(request_elements)}")
-    #st.success(f"Total elementos response: {len(response_elements)}")
+    st.success(f"Total elementos request: {len(request_elements)}")
+    st.success(f"Total elementos response: {len(response_elements)}")
     return request_elements, response_elements
 
 
@@ -507,7 +507,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
     type_name = type_name.split(':')[-1]  
 
     if type_name in complex_types:
-        #st.success(f"Explorando complexType: {type_name}")
+        st.success(f"Explorando complexType: {type_name}")
 
         # 🔹 Buscar un prefijo válido
         prefix = next((p for p in ['xs', 'xsd'] if p in namespaces), None)
@@ -521,7 +521,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             return
 
-        #st.success(f"Usando prefijo: {prefix}")
+        st.success(f"Usando prefijo: {prefix}")
 
         if prefix not in namespaces:
             st.error(f"⛔ Error: el prefijo '{prefix}' no está en namespaces: {namespaces}")
@@ -532,7 +532,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             element_type = element.attrib.get('type', '')
 
             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-            #st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
+            st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
             # 🔹 Buscar 'simpleType' con prefijo válido
             simple_type = element.find(f'{prefix}:simpleType', namespaces)
@@ -540,7 +540,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 restriction = simple_type.find(f'{prefix}:restriction', namespaces)
                 if restriction is not None and 'base' in restriction.attrib:
                     element_type = restriction.attrib['base']
-                    #st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
+                    st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
 
             if element_type.startswith(("xsd:", "xs:")):
                 element_details = {
@@ -554,7 +554,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     'service_name': service_name,
                     'operation_actual': operation_actual,
                 }
-                #st.success(f"Agregando elemento primitivo: {element_details}")
+                st.success(f"Agregando elemento primitivo: {element_details}")
 
                 if 'Request' in parent_element_name:
                     request_elements.append(element_details)
@@ -562,7 +562,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     response_elements.append(element_details)
 
             elif element_type in complex_types:
-                #st.success(f"Buscando {element_type} en el mismo XSD")
+                st.success(f"Buscando {element_type} en el mismo XSD")
                 explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                       xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                       operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -571,7 +571,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 prefix, nested_type = element_type.split(':')
                 
                 if nested_type in complex_types:
-                    #st.success(f"Buscando {nested_type} en el mismo XSD")
+                    st.success(f"Buscando {nested_type} en el mismo XSD")
                     explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                           operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -581,9 +581,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         schema_location = imports[namespace]
                         #st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
                         corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
-                        #st.success(f"corrected_xsd_path: {corrected_xsd_path}")
+                        st.success(f"corrected_xsd_path: {corrected_xsd_path}")
                         new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
-                        #st.success(f"new_xsd_path: {new_xsd_path}")
+                        st.success(f"new_xsd_path: {new_xsd_path}")
 
                         parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
                                        capa_proyecto, operacion_business, operations, 
@@ -993,256 +993,257 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 if elements['request']:
                     
                     st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
-                    st.success(f"⏳ Creando documentacion operacion: {operation}")
-                    
-                    contiene_cabecera_entrada = False
-                    contiene_cabecera_salida = False
-                    
-                    if any('cabeceraEntrada.seguridad' in elem['name'] for elem in elements['request']):
-                        print_with_line_number("Se encontró al menos un elemento con '.cabeceraEntrada.seguridad'")
-                        contiene_cabecera_entrada = True
-                    
-                    if any('cabeceraSalida.' in elem['name'] for elem in elements['response']):
-                        contiene_cabecera_salida = True
+                    with st.spinner(f"⏳ Creando documentacion operacion: {operation}"", por favor espera..."):
+                        #st.success(f"⏳ Creando documentacion operacion: {operation}")
                         
-                    # Cargar el documento de la plantilla
-                    doc = Document(plantilla_path)
-                    
-                    # Contar el número de tablas en el documento
-                    num_tables = len(doc.tables)
-                    
-                    #st.success(f"El documento contiene {num_tables} tabla(s).")
-
-                    # Mostrar cada tabla
-                    for i, table in enumerate(doc.tables):
-                        #st.success(f"\nTabla {i+1}:")
-                        for row in table.rows:
-                            row_data = [cell.text for cell in row.cells]
-                            print_with_line_number('\t'.join(row_data))
-                    
-                    url = ""
-                    ruta =""
-                    business = ""
-                    
-                    for elem in elements['url']:
-                        url = elem['url']
+                        contiene_cabecera_entrada = False
+                        contiene_cabecera_salida = False
                         
-                    for elem in elements['ruta']:
-                        ruta = elem['ruta']
-                    
-                    for elem in elements['business']:
-                        business = elem['business']
+                        if any('cabeceraEntrada.seguridad' in elem['name'] for elem in elements['request']):
+                            print_with_line_number("Se encontró al menos un elemento con '.cabeceraEntrada.seguridad'")
+                            contiene_cabecera_entrada = True
                         
-                    #st.success(f"url: {url}")
-                    print_with_line_number("")
-                    #st.success(f"ruta: {ruta}")
-                    print_with_line_number("")
-                    #st.success(f"business: {business}")
-                    print_with_line_number("")
-                    fecha_actual = datetime.now()
-                    fecha_formateada = fecha_actual.strftime("%d/%m/%Y")
-                    
-                    print_with_line_number("")
-                    print_with_line_number("")
-                    #st.success(f"operation: {operation}")
-                    
-                    #st.success(f"elements: {elements}")
-                    print_with_line_number("")
-                    print_with_line_number("")
-                    
-                    # Definir las variables y sus valores
-                    variables = {
-                        '{nombre_servicio_inicial}': service_name,
-                        '{nombre_servicio_secundario}': service_name,
-                        '{nombre_servicio}': service_name,
-                        '{nombre_operacion_inicial}' : operation,
-                        '{nombre_operacion}': operation,
-                        '{unique_operations}': operaciones_formateadas,
-                        '{nombre_servicio_contrato}': service_name,
-                        '{nombre_servicio_wsdl}': service_name,
-                        '{nombre_servicio_contrato2}': service_name,
-                        '{nombre_servicio_tabla}': operation,
-                        '{fecha}': fecha_formateada,
-                        '{autor_inicial}': 'Kevin Torres',
-                        '{autor}': 'Kevin Torres',
-                        '{autor2}': 'Julian Orjuela',
-                        '{url}': url,
-                        '{operacion_legado}': business,
-                        '{proyecto_abc}': 'TENENCIA_COMPORTAMIENTO_ABC'
-                        # Añade más variables según sea necesario
-                    }
-                    
-                    #st.success(f"service_name: {service_name}")
-                    #st.success(f"variables: {variables}")
-                    
-                    total_tablas = len(doc.tables)
-                    #st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
-                    
-                    
-                    tabla_cabecera_entrada_numero = 4
-                    tabla_cabecera_entrada = doc.tables[tabla_cabecera_entrada_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
-
-                    tabla_request_numero = 5
-                    tabla_request = doc.tables[tabla_request_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
-                    
-                    tabla_cabecera_salida_numero = 6
-                    tabla_cabecera_salida = doc.tables[tabla_cabecera_salida_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
-                    
-                    if tabla_cabecera_salida_numero > total_tablas:
-                        st.error(f"⛔ Error: Se intentó acceder a la tabla {tabla_cabecera_salida_numero}, pero el documento solo tiene {total_tablas} tablas.")
-                        return  # Salir para evitar el error
-                    
-                    # Listas para almacenar las filas de cada subtabla
-                    cabecera_salida = []
-                    datos_respuesta = []
-                    
-                    # Variables de control
-                    seccion_actual = None
-                    
-                    #st.success(f"Número total de tablas en el documento: {len(doc.tables)}")
-                    
-                    for i, table in enumerate(doc.tables):
-                        #st.success(f"Tabla {i + 1}:")  # Mostrar el número de la tabla
-
-                        for row in table.rows:
-                            row_text = [cell.text.strip() for cell in row.cells]  # Extraer el texto de cada celda
-                            #st.success(f"  {row_text}")  # Imprimir el contenido de la fila
-
-                        print_with_line_number("-" * 50)  # Separador entre tablas
-                   
-                   
-                    # Recorrer las filas de la tabla 7
-                    for row in tabla_cabecera_salida.rows:
-                        row_text = [cell.text.strip() for cell in row.cells]
-
-                        # Detectar la cabecera de cada subtabla
-                        if "Cabecera de salida" in row_text:
-                            seccion_actual = "cabecera_salida"
-                            continue  # Saltar a la siguiente fila
-
-                        if "Datos Respuesta" in row_text:
-                            seccion_actual = "datos_respuesta"
-                            continue  # Saltar a la siguiente fila
-
-                        # Guardar las filas en la subtabla correspondiente
-                        if seccion_actual == "cabecera_salida":
-                            cabecera_salida.append(row_text)
-
-                        elif seccion_actual == "datos_respuesta":
-                            datos_respuesta.append(row_text)
-                   
-                    # Identificar la sección "Datos Respuesta"
-                    for row in tabla_cabecera_salida.rows:
-                        if "Datos Respuesta" in row.cells[0].text:
-                            tabla_response = tabla_cabecera_salida  # Ahora sí es una tabla válida
-                            break
-                    else:
-                        print_with_line_number("No se encontró la sección 'Datos Respuesta' en la tabla 7.")
-                        tabla_response = None  # Para evitar futuros errores
-                   
-                    
-                    # Datos por defecto para LONGITUD y OBSERVACIÓN
-                    default_longitud = "default"
-                    default_observacion = ""
-                    
-                    # Limpiar la tabla antes de agregar elementos de esta operación
-                    if not contiene_cabecera_entrada:
-                        tbl = tabla_cabecera_entrada._element
-                        tbl.getparent().remove(tbl)
-                        while len(tabla_cabecera_entrada.rows) > 1:
-                            tabla_cabecera_entrada._element.remove(tabla_cabecera_entrada.rows[1]._element)
+                        if any('cabeceraSalida.' in elem['name'] for elem in elements['response']):
+                            contiene_cabecera_salida = True
                             
-                    # Limpiar la tabla antes de agregar elementos de esta operación
-                    if not contiene_cabecera_salida:
-                        #tbl = tabla_cabecera_salida._element
-                        #tbl.getparent().remove(tbl)
-                        while len(tabla_cabecera_salida.rows) > 1:
-                            tabla_cabecera_salida._element.remove(tabla_cabecera_salida.rows[1]._element)
+                        # Cargar el documento de la plantilla
+                        doc = Document(plantilla_path)
+                        
+                        # Contar el número de tablas en el documento
+                        num_tables = len(doc.tables)
+                        
+                        #st.success(f"El documento contiene {num_tables} tabla(s).")
 
-                    # Limpiar la tabla antes de agregar elementos de esta operación
-                    while len(tabla_request.rows) > 2:
-                        tabla_request._element.remove(tabla_request.rows[2]._element)
-                    
-                    # Procesar los datos
-                    for elem in elements['request']:
+                        # Mostrar cada tabla
+                        for i, table in enumerate(doc.tables):
+                            #st.success(f"\nTabla {i+1}:")
+                            for row in table.rows:
+                                row_data = [cell.text for cell in row.cells]
+                                print_with_line_number('\t'.join(row_data))
                         
-                        #if 'cabeceraEntrada.' not in elem['name']:
-                        # Añadir una nueva fila al final de la tabla
-                        fila = tabla_request.add_row().cells
+                        url = ""
+                        ruta =""
+                        business = ""
                         
-                        # Rellenar la fila con los datos correspondientes
-                        #fila[0].text = operation + "Request" + "." + elem['name']
-                        fila[0].text = elem['name']
-                        #st.success(f"fila[0].text: {fila[0].text}")
-                        fila[1].text = elem['name']
-                        campo = fila[1].text.split('.')[-1]
-                        fila[1].text = campo
-                        #st.success(f"fila[1].text: {fila[1].text}")
-                        fila[2].text = default_longitud
-                        fila[3].text = elem['type']
-                        tipo_campo = fila[3].text.split(':')[-1]
-                        if tipo_campo == 'string':
-                            tipo_campo = 'Alfanumérico'
-                        fila[3].text = tipo_campo
-                        #st.success(f"fila[3].text: {fila[3].text}")
+                        for elem in elements['url']:
+                            url = elem['url']
+                            
+                        for elem in elements['ruta']:
+                            ruta = elem['ruta']
+                        
+                        for elem in elements['business']:
+                            business = elem['business']
+                            
+                        #st.success(f"url: {url}")
+                        print_with_line_number("")
+                        #st.success(f"ruta: {ruta}")
+                        print_with_line_number("")
+                        #st.success(f"business: {business}")
+                        print_with_line_number("")
+                        fecha_actual = datetime.now()
+                        fecha_formateada = fecha_actual.strftime("%d/%m/%Y")
+                        
+                        print_with_line_number("")
+                        print_with_line_number("")
+                        #st.success(f"operation: {operation}")
+                        
+                        #st.success(f"elements: {elements}")
+                        print_with_line_number("")
+                        print_with_line_number("")
+                        
+                        # Definir las variables y sus valores
+                        variables = {
+                            '{nombre_servicio_inicial}': service_name,
+                            '{nombre_servicio_secundario}': service_name,
+                            '{nombre_servicio}': service_name,
+                            '{nombre_operacion_inicial}' : operation,
+                            '{nombre_operacion}': operation,
+                            '{unique_operations}': operaciones_formateadas,
+                            '{nombre_servicio_contrato}': service_name,
+                            '{nombre_servicio_wsdl}': service_name,
+                            '{nombre_servicio_contrato2}': service_name,
+                            '{nombre_servicio_tabla}': operation,
+                            '{fecha}': fecha_formateada,
+                            '{autor_inicial}': 'Kevin Torres',
+                            '{autor}': 'Kevin Torres',
+                            '{autor2}': 'Julian Orjuela',
+                            '{url}': url,
+                            '{operacion_legado}': business,
+                            '{proyecto_abc}': 'TENENCIA_COMPORTAMIENTO_ABC'
+                            # Añade más variables según sea necesario
+                        }
+                        
+                        #st.success(f"service_name: {service_name}")
+                        #st.success(f"variables: {variables}")
+                        
+                        total_tablas = len(doc.tables)
+                        #st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
                         
                         
-                    # Limpiar la tabla antes de agregar elementos de esta operación
-                    while len(tabla_response.rows) > 2:
-                        tabla_response._element.remove(tabla_response.rows[2]._element)
-                    
-                    # Procesar los datos
-                    for elem in elements['response']:
-                        
-                        
-                        #if 'cabeceraSalida.' not in elem['name']:
-                        # Añadir una nueva fila al final de la tabla
-                        fila = tabla_response.add_row().cells
-                        
-                        # Rellenar la fila con los datos correspondientes
-                        #fila[0].text = operation + "Response" + "." + elem['name']
-                        fila[0].text = elem['name']
-                        #st.success(f"fila[0].text: {fila[0].text}")
-                        fila[1].text = elem['name']
-                        campo = fila[1].text.split('.')[-1]
-                        fila[1].text = campo
-                        #st.success(f"fila[1].text: {fila[1].text}")
-                        fila[2].text = default_longitud
-                        fila[3].text = elem['type']
-                        tipo_campo = fila[3].text.split(':')[-1]
-                        if tipo_campo == 'string':
-                            tipo_campo = 'Alfanumérico'
-                        fila[3].text = tipo_campo
-                        #st.success(f"fila[3].text: {fila[3].text}")
+                        tabla_cabecera_entrada_numero = 4
+                        tabla_cabecera_entrada = doc.tables[tabla_cabecera_entrada_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
 
-                    print_with_line_number("___________________________________________")
-                    
-                    #st.success(f"✅ temp_dir  {temp_dir }")
-                    #st.success(f"✅ ruta_temporal  {ruta_temporal }")
+                        tabla_request_numero = 5
+                        tabla_request = doc.tables[tabla_request_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
+                        
+                        tabla_cabecera_salida_numero = 6
+                        tabla_cabecera_salida = doc.tables[tabla_cabecera_salida_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
+                        
+                        if tabla_cabecera_salida_numero > total_tablas:
+                            st.error(f"⛔ Error: Se intentó acceder a la tabla {tabla_cabecera_salida_numero}, pero el documento solo tiene {total_tablas} tablas.")
+                            return  # Salir para evitar el error
+                        
+                        # Listas para almacenar las filas de cada subtabla
+                        cabecera_salida = []
+                        datos_respuesta = []
+                        
+                        # Variables de control
+                        seccion_actual = None
+                        
+                        #st.success(f"Número total de tablas en el documento: {len(doc.tables)}")
+                        
+                        for i, table in enumerate(doc.tables):
+                            #st.success(f"Tabla {i + 1}:")  # Mostrar el número de la tabla
 
-                    # Lista para almacenar las rutas de los documentos generados
-                    documentos_generados = []
+                            for row in table.rows:
+                                row_text = [cell.text.strip() for cell in row.cells]  # Extraer el texto de cada celda
+                                #st.success(f"  {row_text}")  # Imprimir el contenido de la fila
 
-                    ruta_proyecto = ruta.strip("/")  # Asegurar que la ruta no tenga "/" al inicio
-                    #st.success(f"✅ ruta_proyecto  {ruta_proyecto }")
-                    nombre_documento = f"Especificación Servicio WSDL {operation}.docx"
-                    
-                    # Crear la ruta dentro de la carpeta temporal
-                    carpeta_destino = os.path.join(ruta_temporal, ruta_proyecto)
-                    os.makedirs(carpeta_destino, exist_ok=True)  # Crear la carpeta si no existe
-                    
-                    ruta_guardado = os.path.join(carpeta_destino, nombre_documento)
-                    
-                    doc_nuevo = replace_text_in_doc(doc, variables)
-                    doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
-                    st.success(f"📄 Documento guardado: ✅ {nombre_documento}")
-                    
-                    # 📌 Agregar el documento al ZIP
-                    if os.path.exists(ruta_guardado):
-                        zipf.write(ruta_guardado, os.path.join(ruta_proyecto, nombre_documento))
-                        #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
-                    else:
-                        st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
+                            print_with_line_number("-" * 50)  # Separador entre tablas
+                       
+                       
+                        # Recorrer las filas de la tabla 7
+                        for row in tabla_cabecera_salida.rows:
+                            row_text = [cell.text.strip() for cell in row.cells]
+
+                            # Detectar la cabecera de cada subtabla
+                            if "Cabecera de salida" in row_text:
+                                seccion_actual = "cabecera_salida"
+                                continue  # Saltar a la siguiente fila
+
+                            if "Datos Respuesta" in row_text:
+                                seccion_actual = "datos_respuesta"
+                                continue  # Saltar a la siguiente fila
+
+                            # Guardar las filas en la subtabla correspondiente
+                            if seccion_actual == "cabecera_salida":
+                                cabecera_salida.append(row_text)
+
+                            elif seccion_actual == "datos_respuesta":
+                                datos_respuesta.append(row_text)
+                       
+                        # Identificar la sección "Datos Respuesta"
+                        for row in tabla_cabecera_salida.rows:
+                            if "Datos Respuesta" in row.cells[0].text:
+                                tabla_response = tabla_cabecera_salida  # Ahora sí es una tabla válida
+                                break
+                        else:
+                            print_with_line_number("No se encontró la sección 'Datos Respuesta' en la tabla 7.")
+                            tabla_response = None  # Para evitar futuros errores
+                       
+                        
+                        # Datos por defecto para LONGITUD y OBSERVACIÓN
+                        default_longitud = "default"
+                        default_observacion = ""
+                        
+                        # Limpiar la tabla antes de agregar elementos de esta operación
+                        if not contiene_cabecera_entrada:
+                            tbl = tabla_cabecera_entrada._element
+                            tbl.getparent().remove(tbl)
+                            while len(tabla_cabecera_entrada.rows) > 1:
+                                tabla_cabecera_entrada._element.remove(tabla_cabecera_entrada.rows[1]._element)
+                                
+                        # Limpiar la tabla antes de agregar elementos de esta operación
+                        if not contiene_cabecera_salida:
+                            #tbl = tabla_cabecera_salida._element
+                            #tbl.getparent().remove(tbl)
+                            while len(tabla_cabecera_salida.rows) > 1:
+                                tabla_cabecera_salida._element.remove(tabla_cabecera_salida.rows[1]._element)
+
+                        # Limpiar la tabla antes de agregar elementos de esta operación
+                        while len(tabla_request.rows) > 2:
+                            tabla_request._element.remove(tabla_request.rows[2]._element)
+                        
+                        # Procesar los datos
+                        for elem in elements['request']:
+                            
+                            #if 'cabeceraEntrada.' not in elem['name']:
+                            # Añadir una nueva fila al final de la tabla
+                            fila = tabla_request.add_row().cells
+                            
+                            # Rellenar la fila con los datos correspondientes
+                            #fila[0].text = operation + "Request" + "." + elem['name']
+                            fila[0].text = elem['name']
+                            #st.success(f"fila[0].text: {fila[0].text}")
+                            fila[1].text = elem['name']
+                            campo = fila[1].text.split('.')[-1]
+                            fila[1].text = campo
+                            #st.success(f"fila[1].text: {fila[1].text}")
+                            fila[2].text = default_longitud
+                            fila[3].text = elem['type']
+                            tipo_campo = fila[3].text.split(':')[-1]
+                            if tipo_campo == 'string':
+                                tipo_campo = 'Alfanumérico'
+                            fila[3].text = tipo_campo
+                            #st.success(f"fila[3].text: {fila[3].text}")
+                            
+                            
+                        # Limpiar la tabla antes de agregar elementos de esta operación
+                        while len(tabla_response.rows) > 2:
+                            tabla_response._element.remove(tabla_response.rows[2]._element)
+                        
+                        # Procesar los datos
+                        for elem in elements['response']:
+                            
+                            
+                            #if 'cabeceraSalida.' not in elem['name']:
+                            # Añadir una nueva fila al final de la tabla
+                            fila = tabla_response.add_row().cells
+                            
+                            # Rellenar la fila con los datos correspondientes
+                            #fila[0].text = operation + "Response" + "." + elem['name']
+                            fila[0].text = elem['name']
+                            #st.success(f"fila[0].text: {fila[0].text}")
+                            fila[1].text = elem['name']
+                            campo = fila[1].text.split('.')[-1]
+                            fila[1].text = campo
+                            #st.success(f"fila[1].text: {fila[1].text}")
+                            fila[2].text = default_longitud
+                            fila[3].text = elem['type']
+                            tipo_campo = fila[3].text.split(':')[-1]
+                            if tipo_campo == 'string':
+                                tipo_campo = 'Alfanumérico'
+                            fila[3].text = tipo_campo
+                            #st.success(f"fila[3].text: {fila[3].text}")
+
+                        print_with_line_number("___________________________________________")
+                        
+                        #st.success(f"✅ temp_dir  {temp_dir }")
+                        #st.success(f"✅ ruta_temporal  {ruta_temporal }")
+
+                        # Lista para almacenar las rutas de los documentos generados
+                        documentos_generados = []
+
+                        ruta_proyecto = ruta.strip("/")  # Asegurar que la ruta no tenga "/" al inicio
+                        #st.success(f"✅ ruta_proyecto  {ruta_proyecto }")
+                        nombre_documento = f"Especificación Servicio WSDL {operation}.docx"
+                        
+                        # Crear la ruta dentro de la carpeta temporal
+                        carpeta_destino = os.path.join(ruta_temporal, ruta_proyecto)
+                        os.makedirs(carpeta_destino, exist_ok=True)  # Crear la carpeta si no existe
+                        
+                        ruta_guardado = os.path.join(carpeta_destino, nombre_documento)
+                        
+                        doc_nuevo = replace_text_in_doc(doc, variables)
+                        doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
+                        st.success(f"📄 Documento guardado: ✅ {nombre_documento}")
+                        
+                        # 📌 Agregar el documento al ZIP
+                        if os.path.exists(ruta_guardado):
+                            zipf.write(ruta_guardado, os.path.join(ruta_proyecto, nombre_documento))
+                            #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
+                        else:
+                            st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:
