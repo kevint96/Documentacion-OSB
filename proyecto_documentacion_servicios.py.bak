@@ -992,7 +992,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 
                 if elements['request']:
                     
-                    st.success(f"🔍 Operacion: {operation}")
+                    st.success(f"🔍 Revisando operacion: {operation}")
                     
                     contiene_cabecera_entrada = False
                     contiene_cabecera_salida = False
@@ -1075,7 +1075,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     #st.success(f"variables: {variables}")
                     
                     total_tablas = len(doc.tables)
-                    st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
+                    #st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
                     
                     
                     tabla_cabecera_entrada_numero = 4
@@ -1233,18 +1233,20 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     
                     doc_nuevo = replace_text_in_doc(doc, variables)
                     doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
-                    st.success(f"📄 Documento guardado: {ruta_guardado}")
+                    st.success(f"📄 Documento guardado: ✅ {nombre_documento}")
                     
                     # 📌 Agregar el documento al ZIP
                     if os.path.exists(ruta_guardado):
                         zipf.write(ruta_guardado, os.path.join(ruta_proyecto, nombre_documento))
-                        st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
+                        #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
                     else:
                         #st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:
             zip_bytes = file.read()
+
+        st.success("Documentación generada con éxito!")
 
         st.download_button(
             label="📥 Descargar TODOS los documentos en ZIP",
@@ -1253,8 +1255,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             mime="application/zip",
             key="download_all"
         )
-        st.success("Documentación generada con éxito!")
-        
+
 
 def main():
     st.title("📄 Generador de Documentación OSB")

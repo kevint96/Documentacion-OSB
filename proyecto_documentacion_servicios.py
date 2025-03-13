@@ -516,7 +516,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         # 🔹 Buscar 'sequence' con prefijo válido
         sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
         if sequence is None:
-            #st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
+            st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             return
 
         #st.success(f"Usando prefijo: {prefix}")
@@ -589,11 +589,11 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                                        request_elements=request_elements,
                                        response_elements=response_elements)
                     else:
-                        #st.warning(f"No se encontró el namespace para el prefijo {prefix}")
+                        st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                 else:
-                    #st.warning(f"complexType {element_type} no encontrado en el XSD")
+                    st.warning(f"complexType {element_type} no encontrado en el XSD")
     else:
-        #st.warning(f"complexType {type_name} no encontrado en el XSD")
+        st.warning(f"complexType {type_name} no encontrado en el XSD")
 
 def leer_xsd_file(xsd_file_path, complexType_name):
     elements_list = []
@@ -1240,7 +1240,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         zipf.write(ruta_guardado, os.path.join(ruta_proyecto, nombre_documento))
                         #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
                     else:
-                        #st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
+                        st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:
