@@ -516,7 +516,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         # 🔹 Buscar 'sequence' con prefijo válido
         sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
         if sequence is None:
-            #st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
+            st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             return
 
         #st.success(f"Usando prefijo: {prefix}")
@@ -589,11 +589,11 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                                        request_elements=request_elements,
                                        response_elements=response_elements)
                     else:
-                        #st.warning(f"No se encontró el namespace para el prefijo {prefix}")
+                        st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                 else:
-                    #st.warning(f"complexType {element_type} no encontrado en el XSD")
+                    st.warning(f"complexType {element_type} no encontrado en el XSD")
     else:
-        #st.warning(f"complexType {type_name} no encontrado en el XSD")
+        st.warning(f"complexType {type_name} no encontrado en el XSD")
 
 def leer_xsd_file(xsd_file_path, complexType_name):
     elements_list = []
@@ -855,33 +855,6 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
     #st.success(f"osb_services: {osb_services}")
     return osb_services
 
-def extraer_jar(archivo_jar):
-    """ Extrae el contenido de un .jar en una carpeta temporal en Windows. """
-    try:
-        # Obtener la ruta temporal
-        ruta_temporal = os.path.join(tempfile.gettempdir(), "extraccion_jar")
-        os.makedirs(ruta_temporal, exist_ok=True)
-
-        # Verificar si el archivo JAR existe
-        if not os.path.exists(archivo_jar):
-            raise FileNotFoundError(f"El archivo .jar no existe: {archivo_jar}")
-
-        # Ejecutar el comando 'jar xf'
-        comando = f'java -jar {archivo_jar} -xf'
-        resultado = subprocess.run(
-            comando, shell=True, cwd=ruta_temporal,
-            capture_output=True, text=True
-        )
-
-        # Validar la ejecución
-        if resultado.returncode != 0:
-            raise Exception(resultado.stderr)
-
-        return ruta_temporal
-    except Exception as e:
-        st.error(f"Error al extraer el .jar: {e}")
-        return None
-
 def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     """Función que ejecuta la generación de documentación."""
     
@@ -899,6 +872,14 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     # Crear una carpeta temporal para almacenar los documentos
     temp_dir = tempfile.TemporaryDirectory()
     ruta_temporal = temp_dir.name  # Obtener la ruta temporal
+    
+    # 📌 Eliminar archivos y carpetas anteriores si existen
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)  # 🔥 Borra todo el contenido anterior
+        st.warning("📂 Se limpiaron los archivos temporales previos.")
+
+    # 📌 Crear nuevamente la carpeta temporal
+    os.makedirs(temp_dir, exist_ok=True)
     
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir,operacion_a_documentar)
@@ -1240,7 +1221,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         zipf.write(ruta_guardado, os.path.join(ruta_proyecto, nombre_documento))
                         #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
                     else:
-                        #st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
+                        st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:

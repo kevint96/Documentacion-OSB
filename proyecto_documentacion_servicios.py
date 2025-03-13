@@ -423,7 +423,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     ruta_corregida = os.path.join(extraccion_dir, subcarpeta_xsd, os.path.basename(xsd_file_path))
     
-    #st.success(f"Ruta corregida FINAL: {ruta_corregida}")
+    st.success(f"Ruta corregida FINAL: {ruta_corregida}")
     
     if not os.path.isfile(ruta_corregida):
         st.error(f"El archivo XSD {ruta_corregida} no existe.")
@@ -437,7 +437,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', xsd_content, re.DOTALL)
     if cdata_match:
         xsd_content = cdata_match.group(1)
-        #st.success("Se ha extraído el contenido de CDATA correctamente")
+        st.success("Se ha extraído el contenido de CDATA correctamente")
 
     try:
         root = ET.fromstring(xsd_content)
@@ -448,8 +448,8 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     namespaces = extract_namespaces(xsd_content)
     imports = extract_imports(root)
 
-    #st.success(f"Namespaces detectados: {namespaces}")
-    #st.success(f"Imports encontrados: {imports}")
+    st.success(f"Namespaces detectados: {namespaces}")
+    st.success(f"Imports encontrados: {imports}")
 
     # 🔹 Verificar qué prefijos están en el namespaces
     valid_prefixes = [p for p in ['xs', 'xsd'] if p in namespaces]
@@ -460,7 +460,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🔹 Tomar el primer prefijo encontrado en namespaces (xs o xsd)
     prefix = valid_prefixes[0]
-    #st.success(f"prefix: {prefix}")
+    st.success(f"prefix: {prefix}")
 
     # 🔹 Buscar complexTypes con el prefijo detectado dinámicamente
     complex_types = {
@@ -477,7 +477,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🚀 **Si `target_complex_type` está definido, buscar SOLO ese complexType.**
     if target_complex_type:
-        #st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
+        st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
         explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                               operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -485,15 +485,15 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🔹 Si `target_complex_type` no está, procesamos TODO desde los elementos raíz.
     for root_element_name, complex_type in root_elements.items():
-        #st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
+        st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
 
         if complex_type in complex_types:
             explorar_complex_type(complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                   operations, service_name, operation_actual, request_elements, response_elements, operation_name)
 
-    #st.success(f"Total elementos request: {len(request_elements)}")
-    #st.success(f"Total elementos response: {len(response_elements)}")
+    st.success(f"Total elementos request: {len(request_elements)}")
+    st.success(f"Total elementos response: {len(response_elements)}")
     return request_elements, response_elements
 
 
@@ -505,7 +505,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
     type_name = type_name.split(':')[-1]  
 
     if type_name in complex_types:
-        #st.success(f"Explorando complexType: {type_name}")
+        st.success(f"Explorando complexType: {type_name}")
 
         # 🔹 Buscar un prefijo válido
         prefix = next((p for p in ['xs', 'xsd'] if p in namespaces), None)
@@ -519,7 +519,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             return
 
-        #st.success(f"Usando prefijo: {prefix}")
+        st.success(f"Usando prefijo: {prefix}")
 
         if prefix not in namespaces:
             st.error(f"⛔ Error: el prefijo '{prefix}' no está en namespaces: {namespaces}")
@@ -530,7 +530,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             element_type = element.attrib.get('type', '')
 
             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-            #st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
+            st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
             # 🔹 Buscar 'simpleType' con prefijo válido
             simple_type = element.find(f'{prefix}:simpleType', namespaces)
@@ -538,7 +538,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 restriction = simple_type.find(f'{prefix}:restriction', namespaces)
                 if restriction is not None and 'base' in restriction.attrib:
                     element_type = restriction.attrib['base']
-                    #st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
+                    st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
 
             if element_type.startswith(("xsd:", "xs:")):
                 element_details = {
@@ -552,7 +552,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     'service_name': service_name,
                     'operation_actual': operation_actual,
                 }
-                #st.success(f"Agregando elemento primitivo: {element_details}")
+                st.success(f"Agregando elemento primitivo: {element_details}")
 
                 if 'Request' in parent_element_name:
                     request_elements.append(element_details)
@@ -560,7 +560,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     response_elements.append(element_details)
 
             elif element_type in complex_types:
-                #st.success(f"Buscando {element_type} en el mismo XSD")
+                st.success(f"Buscando {element_type} en el mismo XSD")
                 explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                       xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                       operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -569,7 +569,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 prefix, nested_type = element_type.split(':')
                 
                 if nested_type in complex_types:
-                    #st.success(f"Buscando {nested_type} en el mismo XSD")
+                    st.success(f"Buscando {nested_type} en el mismo XSD")
                     explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                           operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -855,32 +855,6 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
     #st.success(f"osb_services: {osb_services}")
     return osb_services
 
-def extraer_jar(archivo_jar):
-    """ Extrae el contenido de un .jar en una carpeta temporal en Windows. """
-    try:
-        # Obtener la ruta temporal
-        ruta_temporal = os.path.join(tempfile.gettempdir(), "extraccion_jar")
-        os.makedirs(ruta_temporal, exist_ok=True)
-
-        # Verificar si el archivo JAR existe
-        if not os.path.exists(archivo_jar):
-            raise FileNotFoundError(f"El archivo .jar no existe: {archivo_jar}")
-
-        # Ejecutar el comando 'jar xf'
-        comando = f'java -jar {archivo_jar} -xf'
-        resultado = subprocess.run(
-            comando, shell=True, cwd=ruta_temporal,
-            capture_output=True, text=True
-        )
-
-        # Validar la ejecución
-        if resultado.returncode != 0:
-            raise Exception(resultado.stderr)
-
-        return ruta_temporal
-    except Exception as e:
-        st.error(f"Error al extraer el .jar: {e}")
-        return None
 
 def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     """Función que ejecuta la generación de documentación."""
@@ -899,6 +873,14 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     # Crear una carpeta temporal para almacenar los documentos
     temp_dir = tempfile.TemporaryDirectory()
     ruta_temporal = temp_dir.name  # Obtener la ruta temporal
+    
+    # 📌 Eliminar archivos y carpetas anteriores si existen
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)  # 🔥 Borra todo el contenido anterior
+        st.warning("📂 Se limpiaron los archivos temporales previos.")
+
+    # 📌 Crear nuevamente la carpeta temporal
+    os.makedirs(temp_dir, exist_ok=True)
     
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir,operacion_a_documentar)
