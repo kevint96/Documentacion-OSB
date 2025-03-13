@@ -519,11 +519,22 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
         if sequence is None:
             st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
-            st.success(f"Explorando complexType: {type_name}")
-            st.success(f"complex_types: {complex_types}")
-            st.success(f"prefix: {prefix}")
-            st.success(f"namespaces: {namespaces}")
-            return
+            
+            complex_content = complex_types[type_name].find(f'{prefix}:complexContent', namespaces)
+            if complex_content is not None:
+                extension = complex_content.find(f'{prefix}:extension', namespaces)
+                if extension is not None and 'base' in extension.attrib:
+                    base_type = extension.attrib['base'].split(":")[-1]  # Obtener el nombre sin prefijo
+                    
+                    st.success(f"🔄 {type_name} extiende {base_type}, explorando {base_type}...")
+                    explorar_complex_type(base_type, parent_element_name, complex_types, namespaces, imports, 
+                                          extraccion_dir, xsd_file_path, project_path, service_url, capa_proyecto, 
+                                          operacion_business, operations, service_name, operation_actual, 
+                                          request_elements, response_elements, operation_name)
+                    return  # Salimos porque ya delegamos la exploración a la base
+                
+            st.warning(f"⚠ No se encontró ni 'sequence' ni 'extension' en {type_name}")
+            return  # Si no hay ni sequence ni extensión, no hay nada más que hacer
 
         #st.success(f"Usando prefijo: {prefix}")
 
@@ -764,7 +775,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
 
     osb_services = []
     elementos_xsd = []
-    # Crear un diccionario de mapeo entre operations y imports basado en nombres de archivos
+    operations =[]
     operation_to_xsd = {}
     ##st.success(f"project_path: {project_path}")
     for root, dirs, files in os.walk(project_path):

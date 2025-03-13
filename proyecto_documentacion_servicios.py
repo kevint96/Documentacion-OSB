@@ -775,7 +775,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
 
     osb_services = []
     elementos_xsd = []
-    # Crear un diccionario de mapeo entre operations y imports basado en nombres de archivos
+    operations =[]
     operation_to_xsd = {}
     ##st.success(f"project_path: {project_path}")
     for root, dirs, files in os.walk(project_path):
@@ -877,7 +877,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                                 xsd = os.path.splitext(xsd)[0] + ".XMLSchema"
                                                 elementos_xsd = parse_xsd_file(project_path,xsd, operation_name,service_url,capa_proyecto,operacion_business,operations, service_name, operation_actual)
                                                 osb_services.append(elementos_xsd)
-                                                break
+                                                return
                                                 
                                 else:
                                     st.error("⛔ No se encuentra la operación en el .jar ⛔")
