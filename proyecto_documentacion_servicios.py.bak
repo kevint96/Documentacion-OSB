@@ -579,7 +579,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         schema_location = imports[namespace]
                         #st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
                         corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
+                        st.success(f"corrected_xsd_path: {corrected_xsd_path}")
                         new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
+                        st.success(f"new_xsd_path: {new_xsd_path}")
 
                         parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
                                        capa_proyecto, operacion_business, operations, 
