@@ -1224,6 +1224,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     documentos_generados = []
 
                     ruta_proyecto = ruta.strip("/")  # Asegurar que la ruta no tenga "/" al inicio
+                    st.success(f"✅ ruta_proyecto  {ruta_proyecto }")
                     nombre_documento = f"Especificación Servicio WSDL {operation}.docx"
                     
                     # Crear la ruta dentro de la carpeta temporal
