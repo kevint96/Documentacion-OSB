@@ -1012,259 +1012,258 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 if elements['request']:
                     
                     st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
-                    with st.spinner(f"⏳ Creando documentacion operacion: {operation}"", por favor espera..."):
-                        #st.success(f"⏳ Creando documentacion operacion: {operation}")
+                    st.success(f"⏳ Creando documentacion operacion: {operation}")
+                    
+                    contiene_cabecera_entrada = False
+                    contiene_cabecera_salida = False
+                    
+                    if any('cabeceraEntrada.seguridad' in elem['name'] for elem in elements['request']):
+                        print_with_line_number("Se encontró al menos un elemento con '.cabeceraEntrada.seguridad'")
+                        contiene_cabecera_entrada = True
+                    
+                    if any('cabeceraSalida.' in elem['name'] for elem in elements['response']):
+                        contiene_cabecera_salida = True
                         
-                        contiene_cabecera_entrada = False
-                        contiene_cabecera_salida = False
+                    # Cargar el documento de la plantilla
+                    doc = Document(plantilla_path)
+                    
+                    # Contar el número de tablas en el documento
+                    num_tables = len(doc.tables)
+                    
+                    #st.success(f"El documento contiene {num_tables} tabla(s).")
+
+                    # Mostrar cada tabla
+                    for i, table in enumerate(doc.tables):
+                        #st.success(f"\nTabla {i+1}:")
+                        for row in table.rows:
+                            row_data = [cell.text for cell in row.cells]
+                            print_with_line_number('\t'.join(row_data))
+                    
+                    url = ""
+                    ruta =""
+                    business = ""
+                    
+                    for elem in elements['url']:
+                        url = elem['url']
                         
-                        if any('cabeceraEntrada.seguridad' in elem['name'] for elem in elements['request']):
-                            print_with_line_number("Se encontró al menos un elemento con '.cabeceraEntrada.seguridad'")
-                            contiene_cabecera_entrada = True
+                    for elem in elements['ruta']:
+                        ruta = elem['ruta']
+                    
+                    for elem in elements['business']:
+                        business = elem['business']
                         
-                        if any('cabeceraSalida.' in elem['name'] for elem in elements['response']):
-                            contiene_cabecera_salida = True
+                    #st.success(f"url: {url}")
+                    print_with_line_number("")
+                    #st.success(f"ruta: {ruta}")
+                    print_with_line_number("")
+                    #st.success(f"business: {business}")
+                    print_with_line_number("")
+                    fecha_actual = datetime.now()
+                    fecha_formateada = fecha_actual.strftime("%d/%m/%Y")
+                    
+                    print_with_line_number("")
+                    print_with_line_number("")
+                    #st.success(f"operation: {operation}")
+                    
+                    #st.success(f"elements: {elements}")
+                    print_with_line_number("")
+                    print_with_line_number("")
+                    
+                    # Definir las variables y sus valores
+                    variables = {
+                        '{nombre_servicio_inicial}': service_name,
+                        '{nombre_servicio_secundario}': service_name,
+                        '{nombre_servicio}': service_name,
+                        '{nombre_operacion_inicial}' : operation,
+                        '{nombre_operacion}': operation,
+                        '{unique_operations}': operaciones_formateadas,
+                        '{nombre_servicio_contrato}': service_name,
+                        '{nombre_servicio_wsdl}': service_name,
+                        '{nombre_servicio_contrato2}': service_name,
+                        '{nombre_servicio_tabla}': operation,
+                        '{fecha}': fecha_formateada,
+                        '{autor_inicial}': 'Kevin Torres',
+                        '{autor}': 'Kevin Torres',
+                        '{autor2}': 'Julian Orjuela',
+                        '{url}': url,
+                        '{operacion_legado}': business,
+                        '{proyecto_abc}': 'TENENCIA_COMPORTAMIENTO_ABC'
+                        # Añade más variables según sea necesario
+                    }
+                    
+                    #st.success(f"service_name: {service_name}")
+                    #st.success(f"variables: {variables}")
+                    
+                    total_tablas = len(doc.tables)
+                    #st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
+                    
+                    
+                    tabla_cabecera_entrada_numero = 4
+                    tabla_cabecera_entrada = doc.tables[tabla_cabecera_entrada_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
+
+                    tabla_request_numero = 5
+                    tabla_request = doc.tables[tabla_request_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
+                    
+                    tabla_cabecera_salida_numero = 6
+                    tabla_cabecera_salida = doc.tables[tabla_cabecera_salida_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
+                    
+                    if tabla_cabecera_salida_numero > total_tablas:
+                        st.error(f"⛔ Error: Se intentó acceder a la tabla {tabla_cabecera_salida_numero}, pero el documento solo tiene {total_tablas} tablas.")
+                        return  # Salir para evitar el error
+                    
+                    # Listas para almacenar las filas de cada subtabla
+                    cabecera_salida = []
+                    datos_respuesta = []
+                    
+                    # Variables de control
+                    seccion_actual = None
+                    
+                    #st.success(f"Número total de tablas en el documento: {len(doc.tables)}")
+                    
+                    for i, table in enumerate(doc.tables):
+                        #st.success(f"Tabla {i + 1}:")  # Mostrar el número de la tabla
+
+                        for row in table.rows:
+                            row_text = [cell.text.strip() for cell in row.cells]  # Extraer el texto de cada celda
+                            #st.success(f"  {row_text}")  # Imprimir el contenido de la fila
+
+                        print_with_line_number("-" * 50)  # Separador entre tablas
+                   
+                   
+                    # Recorrer las filas de la tabla 7
+                    for row in tabla_cabecera_salida.rows:
+                        row_text = [cell.text.strip() for cell in row.cells]
+
+                        # Detectar la cabecera de cada subtabla
+                        if "Cabecera de salida" in row_text:
+                            seccion_actual = "cabecera_salida"
+                            continue  # Saltar a la siguiente fila
+
+                        if "Datos Respuesta" in row_text:
+                            seccion_actual = "datos_respuesta"
+                            continue  # Saltar a la siguiente fila
+
+                        # Guardar las filas en la subtabla correspondiente
+                        if seccion_actual == "cabecera_salida":
+                            cabecera_salida.append(row_text)
+
+                        elif seccion_actual == "datos_respuesta":
+                            datos_respuesta.append(row_text)
+                   
+                    # Identificar la sección "Datos Respuesta"
+                    for row in tabla_cabecera_salida.rows:
+                        if "Datos Respuesta" in row.cells[0].text:
+                            tabla_response = tabla_cabecera_salida  # Ahora sí es una tabla válida
+                            break
+                    else:
+                        print_with_line_number("No se encontró la sección 'Datos Respuesta' en la tabla 7.")
+                        tabla_response = None  # Para evitar futuros errores
+                   
+                    
+                    # Datos por defecto para LONGITUD y OBSERVACIÓN
+                    default_longitud = "default"
+                    default_observacion = ""
+                    
+                    # Limpiar la tabla antes de agregar elementos de esta operación
+                    if not contiene_cabecera_entrada:
+                        tbl = tabla_cabecera_entrada._element
+                        tbl.getparent().remove(tbl)
+                        while len(tabla_cabecera_entrada.rows) > 1:
+                            tabla_cabecera_entrada._element.remove(tabla_cabecera_entrada.rows[1]._element)
                             
-                        # Cargar el documento de la plantilla
-                        doc = Document(plantilla_path)
-                        
-                        # Contar el número de tablas en el documento
-                        num_tables = len(doc.tables)
-                        
-                        #st.success(f"El documento contiene {num_tables} tabla(s).")
+                    # Limpiar la tabla antes de agregar elementos de esta operación
+                    if not contiene_cabecera_salida:
+                        #tbl = tabla_cabecera_salida._element
+                        #tbl.getparent().remove(tbl)
+                        while len(tabla_cabecera_salida.rows) > 1:
+                            tabla_cabecera_salida._element.remove(tabla_cabecera_salida.rows[1]._element)
 
-                        # Mostrar cada tabla
-                        for i, table in enumerate(doc.tables):
-                            #st.success(f"\nTabla {i+1}:")
-                            for row in table.rows:
-                                row_data = [cell.text for cell in row.cells]
-                                print_with_line_number('\t'.join(row_data))
+                    # Limpiar la tabla antes de agregar elementos de esta operación
+                    while len(tabla_request.rows) > 2:
+                        tabla_request._element.remove(tabla_request.rows[2]._element)
+                    
+                    # Procesar los datos
+                    for elem in elements['request']:
                         
-                        url = ""
-                        ruta =""
-                        business = ""
+                        #if 'cabeceraEntrada.' not in elem['name']:
+                        # Añadir una nueva fila al final de la tabla
+                        fila = tabla_request.add_row().cells
                         
-                        for elem in elements['url']:
-                            url = elem['url']
-                            
-                        for elem in elements['ruta']:
-                            ruta = elem['ruta']
-                        
-                        for elem in elements['business']:
-                            business = elem['business']
-                            
-                        #st.success(f"url: {url}")
-                        print_with_line_number("")
-                        #st.success(f"ruta: {ruta}")
-                        print_with_line_number("")
-                        #st.success(f"business: {business}")
-                        print_with_line_number("")
-                        fecha_actual = datetime.now()
-                        fecha_formateada = fecha_actual.strftime("%d/%m/%Y")
-                        
-                        print_with_line_number("")
-                        print_with_line_number("")
-                        #st.success(f"operation: {operation}")
-                        
-                        #st.success(f"elements: {elements}")
-                        print_with_line_number("")
-                        print_with_line_number("")
-                        
-                        # Definir las variables y sus valores
-                        variables = {
-                            '{nombre_servicio_inicial}': service_name,
-                            '{nombre_servicio_secundario}': service_name,
-                            '{nombre_servicio}': service_name,
-                            '{nombre_operacion_inicial}' : operation,
-                            '{nombre_operacion}': operation,
-                            '{unique_operations}': operaciones_formateadas,
-                            '{nombre_servicio_contrato}': service_name,
-                            '{nombre_servicio_wsdl}': service_name,
-                            '{nombre_servicio_contrato2}': service_name,
-                            '{nombre_servicio_tabla}': operation,
-                            '{fecha}': fecha_formateada,
-                            '{autor_inicial}': 'Kevin Torres',
-                            '{autor}': 'Kevin Torres',
-                            '{autor2}': 'Julian Orjuela',
-                            '{url}': url,
-                            '{operacion_legado}': business,
-                            '{proyecto_abc}': 'TENENCIA_COMPORTAMIENTO_ABC'
-                            # Añade más variables según sea necesario
-                        }
-                        
-                        #st.success(f"service_name: {service_name}")
-                        #st.success(f"variables: {variables}")
-                        
-                        total_tablas = len(doc.tables)
-                        #st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
+                        # Rellenar la fila con los datos correspondientes
+                        #fila[0].text = operation + "Request" + "." + elem['name']
+                        fila[0].text = elem['name']
+                        #st.success(f"fila[0].text: {fila[0].text}")
+                        fila[1].text = elem['name']
+                        campo = fila[1].text.split('.')[-1]
+                        fila[1].text = campo
+                        #st.success(f"fila[1].text: {fila[1].text}")
+                        fila[2].text = default_longitud
+                        fila[3].text = elem['type']
+                        tipo_campo = fila[3].text.split(':')[-1]
+                        if tipo_campo == 'string':
+                            tipo_campo = 'Alfanumérico'
+                        fila[3].text = tipo_campo
+                        #st.success(f"fila[3].text: {fila[3].text}")
                         
                         
-                        tabla_cabecera_entrada_numero = 4
-                        tabla_cabecera_entrada = doc.tables[tabla_cabecera_entrada_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
+                    # Limpiar la tabla antes de agregar elementos de esta operación
+                    while len(tabla_response.rows) > 2:
+                        tabla_response._element.remove(tabla_response.rows[2]._element)
+                    
+                    # Procesar los datos
+                    for elem in elements['response']:
+                        
+                        
+                        #if 'cabeceraSalida.' not in elem['name']:
+                        # Añadir una nueva fila al final de la tabla
+                        fila = tabla_response.add_row().cells
+                        
+                        # Rellenar la fila con los datos correspondientes
+                        #fila[0].text = operation + "Response" + "." + elem['name']
+                        fila[0].text = elem['name']
+                        #st.success(f"fila[0].text: {fila[0].text}")
+                        fila[1].text = elem['name']
+                        campo = fila[1].text.split('.')[-1]
+                        fila[1].text = campo
+                        #st.success(f"fila[1].text: {fila[1].text}")
+                        fila[2].text = default_longitud
+                        fila[3].text = elem['type']
+                        tipo_campo = fila[3].text.split(':')[-1]
+                        if tipo_campo == 'string':
+                            tipo_campo = 'Alfanumérico'
+                        fila[3].text = tipo_campo
+                        #st.success(f"fila[3].text: {fila[3].text}")
 
-                        tabla_request_numero = 5
-                        tabla_request = doc.tables[tabla_request_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
-                        
-                        tabla_cabecera_salida_numero = 6
-                        tabla_cabecera_salida = doc.tables[tabla_cabecera_salida_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
-                        
-                        if tabla_cabecera_salida_numero > total_tablas:
-                            st.error(f"⛔ Error: Se intentó acceder a la tabla {tabla_cabecera_salida_numero}, pero el documento solo tiene {total_tablas} tablas.")
-                            return  # Salir para evitar el error
-                        
-                        # Listas para almacenar las filas de cada subtabla
-                        cabecera_salida = []
-                        datos_respuesta = []
-                        
-                        # Variables de control
-                        seccion_actual = None
-                        
-                        #st.success(f"Número total de tablas en el documento: {len(doc.tables)}")
-                        
-                        for i, table in enumerate(doc.tables):
-                            #st.success(f"Tabla {i + 1}:")  # Mostrar el número de la tabla
+                    print_with_line_number("___________________________________________")
+                    
+                    #st.success(f"✅ temp_dir  {temp_dir }")
+                    #st.success(f"✅ ruta_temporal  {ruta_temporal }")
 
-                            for row in table.rows:
-                                row_text = [cell.text.strip() for cell in row.cells]  # Extraer el texto de cada celda
-                                #st.success(f"  {row_text}")  # Imprimir el contenido de la fila
+                    # Lista para almacenar las rutas de los documentos generados
+                    documentos_generados = []
 
-                            print_with_line_number("-" * 50)  # Separador entre tablas
-                       
-                       
-                        # Recorrer las filas de la tabla 7
-                        for row in tabla_cabecera_salida.rows:
-                            row_text = [cell.text.strip() for cell in row.cells]
-
-                            # Detectar la cabecera de cada subtabla
-                            if "Cabecera de salida" in row_text:
-                                seccion_actual = "cabecera_salida"
-                                continue  # Saltar a la siguiente fila
-
-                            if "Datos Respuesta" in row_text:
-                                seccion_actual = "datos_respuesta"
-                                continue  # Saltar a la siguiente fila
-
-                            # Guardar las filas en la subtabla correspondiente
-                            if seccion_actual == "cabecera_salida":
-                                cabecera_salida.append(row_text)
-
-                            elif seccion_actual == "datos_respuesta":
-                                datos_respuesta.append(row_text)
-                       
-                        # Identificar la sección "Datos Respuesta"
-                        for row in tabla_cabecera_salida.rows:
-                            if "Datos Respuesta" in row.cells[0].text:
-                                tabla_response = tabla_cabecera_salida  # Ahora sí es una tabla válida
-                                break
-                        else:
-                            print_with_line_number("No se encontró la sección 'Datos Respuesta' en la tabla 7.")
-                            tabla_response = None  # Para evitar futuros errores
-                       
-                        
-                        # Datos por defecto para LONGITUD y OBSERVACIÓN
-                        default_longitud = "default"
-                        default_observacion = ""
-                        
-                        # Limpiar la tabla antes de agregar elementos de esta operación
-                        if not contiene_cabecera_entrada:
-                            tbl = tabla_cabecera_entrada._element
-                            tbl.getparent().remove(tbl)
-                            while len(tabla_cabecera_entrada.rows) > 1:
-                                tabla_cabecera_entrada._element.remove(tabla_cabecera_entrada.rows[1]._element)
-                                
-                        # Limpiar la tabla antes de agregar elementos de esta operación
-                        if not contiene_cabecera_salida:
-                            #tbl = tabla_cabecera_salida._element
-                            #tbl.getparent().remove(tbl)
-                            while len(tabla_cabecera_salida.rows) > 1:
-                                tabla_cabecera_salida._element.remove(tabla_cabecera_salida.rows[1]._element)
-
-                        # Limpiar la tabla antes de agregar elementos de esta operación
-                        while len(tabla_request.rows) > 2:
-                            tabla_request._element.remove(tabla_request.rows[2]._element)
-                        
-                        # Procesar los datos
-                        for elem in elements['request']:
-                            
-                            #if 'cabeceraEntrada.' not in elem['name']:
-                            # Añadir una nueva fila al final de la tabla
-                            fila = tabla_request.add_row().cells
-                            
-                            # Rellenar la fila con los datos correspondientes
-                            #fila[0].text = operation + "Request" + "." + elem['name']
-                            fila[0].text = elem['name']
-                            #st.success(f"fila[0].text: {fila[0].text}")
-                            fila[1].text = elem['name']
-                            campo = fila[1].text.split('.')[-1]
-                            fila[1].text = campo
-                            #st.success(f"fila[1].text: {fila[1].text}")
-                            fila[2].text = default_longitud
-                            fila[3].text = elem['type']
-                            tipo_campo = fila[3].text.split(':')[-1]
-                            if tipo_campo == 'string':
-                                tipo_campo = 'Alfanumérico'
-                            fila[3].text = tipo_campo
-                            #st.success(f"fila[3].text: {fila[3].text}")
-                            
-                            
-                        # Limpiar la tabla antes de agregar elementos de esta operación
-                        while len(tabla_response.rows) > 2:
-                            tabla_response._element.remove(tabla_response.rows[2]._element)
-                        
-                        # Procesar los datos
-                        for elem in elements['response']:
-                            
-                            
-                            #if 'cabeceraSalida.' not in elem['name']:
-                            # Añadir una nueva fila al final de la tabla
-                            fila = tabla_response.add_row().cells
-                            
-                            # Rellenar la fila con los datos correspondientes
-                            #fila[0].text = operation + "Response" + "." + elem['name']
-                            fila[0].text = elem['name']
-                            #st.success(f"fila[0].text: {fila[0].text}")
-                            fila[1].text = elem['name']
-                            campo = fila[1].text.split('.')[-1]
-                            fila[1].text = campo
-                            #st.success(f"fila[1].text: {fila[1].text}")
-                            fila[2].text = default_longitud
-                            fila[3].text = elem['type']
-                            tipo_campo = fila[3].text.split(':')[-1]
-                            if tipo_campo == 'string':
-                                tipo_campo = 'Alfanumérico'
-                            fila[3].text = tipo_campo
-                            #st.success(f"fila[3].text: {fila[3].text}")
-
-                        print_with_line_number("___________________________________________")
-                        
-                        #st.success(f"✅ temp_dir  {temp_dir }")
-                        #st.success(f"✅ ruta_temporal  {ruta_temporal }")
-
-                        # Lista para almacenar las rutas de los documentos generados
-                        documentos_generados = []
-
-                        ruta_proyecto = ruta.strip("/")  # Asegurar que la ruta no tenga "/" al inicio
-                        #st.success(f"✅ ruta_proyecto  {ruta_proyecto }")
-                        nombre_documento = f"Especificación Servicio WSDL {operation}.docx"
-                        
-                        # Crear la ruta dentro de la carpeta temporal
-                        carpeta_destino = os.path.join(ruta_temporal, ruta_proyecto)
-                        os.makedirs(carpeta_destino, exist_ok=True)  # Crear la carpeta si no existe
-                        
-                        ruta_guardado = os.path.join(carpeta_destino, nombre_documento)
-                        
-                        doc_nuevo = replace_text_in_doc(doc, variables)
-                        doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
-                        st.success(f"📄 Documento guardado: ✅ {nombre_documento}")
-                        
-                        # 📌 Agregar el documento al ZIP
-                        if os.path.exists(ruta_guardado):
-                            zipf.write(ruta_guardado, os.path.join(ruta_proyecto, nombre_documento))
-                            #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
-                        else:
-                            st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
-                        
-                        generoArchivo = True
+                    ruta_proyecto = ruta.strip("/")  # Asegurar que la ruta no tenga "/" al inicio
+                    #st.success(f"✅ ruta_proyecto  {ruta_proyecto }")
+                    nombre_documento = f"Especificación Servicio WSDL {operation}.docx"
+                    
+                    # Crear la ruta dentro de la carpeta temporal
+                    carpeta_destino = os.path.join(ruta_temporal, ruta_proyecto)
+                    os.makedirs(carpeta_destino, exist_ok=True)  # Crear la carpeta si no existe
+                    
+                    ruta_guardado = os.path.join(carpeta_destino, nombre_documento)
+                    
+                    doc_nuevo = replace_text_in_doc(doc, variables)
+                    doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
+                    st.success(f"📄 Documento guardado: ✅ {nombre_documento}")
+                    
+                    # 📌 Agregar el documento al ZIP
+                    if os.path.exists(ruta_guardado):
+                        zipf.write(ruta_guardado, os.path.join(ruta_proyecto, nombre_documento))
+                        #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
+                    else:
+                        st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
+                    
+                    generoArchivo = True
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:
