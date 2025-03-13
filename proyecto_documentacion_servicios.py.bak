@@ -980,7 +980,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 'service_name': service_name
             }
             
-        #st.success(f"operation_elements: {operation_elements}")
+        st.success(f"operation_elements: {operation_elements}")
         ##st.success(f"service_name: {service_name}")
         # Print the result
         # 📂 Crear un solo ZIP para todas las operaciones
