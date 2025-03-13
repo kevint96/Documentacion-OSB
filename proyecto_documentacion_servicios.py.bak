@@ -869,18 +869,25 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     if not jdeveloper_projects_dir:
         st.error("No se pudo determinar la ruta del proyecto desde el .jar.")
         return
- 
-    # Crear una carpeta temporal para almacenar los documentos
-    temp_dir = tempfile.TemporaryDirectory()
-    ruta_temporal = temp_dir.name  # Obtener la ruta temporal
-    
-    # 📌 Eliminar archivos y carpetas anteriores si existen
-    if os.path.exists(temp_dir):
-        shutil.rmtree(temp_dir)  # 🔥 Borra todo el contenido anterior
-        st.warning("📂 Se limpiaron los archivos temporales previos.")
 
-    # 📌 Crear nuevamente la carpeta temporal
-    os.makedirs(temp_dir, exist_ok=True)
+    # 📌 Definir la ruta del directorio temporal correctamente
+    temp_dir = os.path.join(tempfile.gettempdir(), "documentacion_osb")
+    ruta_temporal = temp_dir.name  # Obtener la ruta temporal
+
+    if not isinstance(temp_dir, str) or not temp_dir:
+        st.error("⛔ Error: La ruta temporal no es válida.")
+    else:
+        # 📌 Verificar si la carpeta existe antes de intentar eliminarla
+        if os.path.exists(temp_dir):
+            try:
+                shutil.rmtree(temp_dir)  # 🔥 Borra todo el contenido anterior
+                st.warning("📂 Se limpiaron los archivos temporales previos.")
+            except Exception as e:
+                st.error(f"⛔ No se pudo eliminar la carpeta temporal: {e}")
+
+        # 📌 Crear nuevamente la carpeta temporal limpia
+        os.makedirs(temp_dir, exist_ok=True)
+        st.success(f"📂 Carpeta temporal creada: {temp_dir}")
     
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir,operacion_a_documentar)
