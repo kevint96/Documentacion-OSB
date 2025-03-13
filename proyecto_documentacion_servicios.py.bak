@@ -520,7 +520,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         if sequence is None:
             st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             st.success(f"Explorando complexType: {type_name}")
-            st.success(f"full_name: {full_name}")
+            st.success(f"complex_types: {complex_types}")
+            st.success(f"prefix: {prefix}")
+            st.success(f"namespaces: {namespaces}")
             return
 
         #st.success(f"Usando prefijo: {prefix}")
