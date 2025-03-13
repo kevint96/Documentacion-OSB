@@ -828,7 +828,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                                 operation_to_xsd[operation] = None  # No se encontró una coincidencia
                                         
                                 
-                                #st.success(f"operation_to_xsd: {operation_to_xsd}")
+                                st.success(f"operation_to_xsd: {operation_to_xsd}")
                                 
                                 # ✅ Si el usuario especificó una operación, verificar si existe en operation_to_xsd
                                 if operacion_a_documentar and operacion_a_documentar not in operation_to_xsd:

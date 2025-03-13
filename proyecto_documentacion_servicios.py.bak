@@ -1243,6 +1243,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             zip_bytes = file.read()
 
         st.success("Documentación generada con éxito!")
+        
+        # 🔹 Descargar automáticamente el ZIP sin necesidad de clic
+        auto_download_zip(zip_path)
 
         st.download_button(
             label="📥 Descargar TODOS los documentos en ZIP",
