@@ -986,7 +986,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 
                 if elements['request']:
                     
-                    st.success(f"✅ Proyecto {elements[0]['ruta'].lstrip('/')}")
+                    st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
                     st.success(f"🔍 Revisando operacion: {operation}")
                     
                     contiene_cabecera_entrada = False
