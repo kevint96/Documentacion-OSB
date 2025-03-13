@@ -922,7 +922,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir,operacion_a_documentar)
     
-    print_with_line_number(f"✅ services_with_data {services_with_data}")
+    st.write(f"✅ services_with_data {services_with_data}")
     
     es_type = False
     
