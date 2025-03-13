@@ -39,12 +39,12 @@ def apply_format(run,fuente,size,negrita,color):
 def replace_text_in_paragraph(paragraph, replacements):
     full_text = paragraph.text
     contador = 1
-    #st.success(f"Texto en linea: {full_text}")
+    ##st.success(f"Texto en linea: {full_text}")
     for key, value in replacements.items():
         if key in full_text:
-            #st.success(f"full_text: {full_text}")
-            #st.success(f"p paragraphs: {paragraph.text}")
-            #st.success(f"clave coincide: {key}")
+            ##st.success(f"full_text: {full_text}")
+            ##st.success(f"p paragraphs: {paragraph.text}")
+            ##st.success(f"clave coincide: {key}")
             full_text = full_text.replace(key, str(value))  # Actualiza full_text
             
             if key in '{nombre_servicio_inicial}':
@@ -140,7 +140,7 @@ def replace_text_in_paragraph(paragraph, replacements):
                 apply_format(paragraph.runs[0],'Arial MT',10,False,0)  # Aplicar formato al texto del párrafo
 
 def print_element_content(element, element_name):
-    st.success(f"Contenido del {element_name}:")
+    #st.success(f"Contenido del {element_name}:")
     for paragraph in element.paragraphs:
         print_with_line_number(paragraph.text)
     for table in element.tables:
@@ -169,10 +169,10 @@ def replace_text_in_doc(doc, replacements):
                     replace_text_in_paragraph(paragraph, replacements)
 
     for section in doc.sections:
-        st.success(f"Encabezado de la sección: {section.header}")
+        #st.success(f"Encabezado de la sección: {section.header}")
         print_element_content(section.header, "Encabezado de la sección")
         replace_text_in_element(section.header, replacements)
-        st.success(f"Pie de página de la sección: {section.footer}")
+        #st.success(f"Pie de página de la sección: {section.footer}")
         print_element_content(section.footer, "Pie de página de la sección")
         replace_text_in_element(section.footer, replacements)
         # Agregamos este bloque específico para procesar las tablas dentro del encabezado de la sección 2
@@ -204,7 +204,7 @@ def service_refs_ruta_pipeline(pipeline_path, project_path):
     
     while True:
         
-        st.success(f"pipeline_path: {pipeline_path}")
+        #st.success(f"pipeline_path: {pipeline_path}")
         
         # Leer el archivo .pipeline
         with open(pipeline_path, 'r') as file:
@@ -230,7 +230,7 @@ def service_refs_ruta_pipeline(pipeline_path, project_path):
             
              # Si el elemento contiene '/BusinessServices/', salir del bucle
             if '/BusinessServices/' in service:
-                st.success(f"BusinessServices: {service}")
+                #st.success(f"BusinessServices: {service}")
                 business_path = os.path.join(project_path, service + '.bix')
                 
                 with open(business_path, 'r') as business_file:
@@ -279,7 +279,7 @@ def service_refs_ruta_pipeline(pipeline_path, project_path):
 
                     # Si el elemento contiene '/BusinessServices/', salir del bucle
                     if '/BusinessServices/' in elemento:
-                        st.success(f"elemento: {elemento}")
+                        #st.success(f"elemento: {elemento}")
                         return elemento
                     else:
                         pipeline_path = os.path.join(project_path, elemento + '.pipeline')
@@ -330,25 +330,25 @@ def find_import_elements_with_namespace(xsd_content, target_namespace, xsd_file_
         'xsd': 'http://www.w3.org/2001/XMLSchema'
         # Agrega otros namespaces si es necesario
     }
-    st.success(f"target_namespace: {target_namespace}")
+    #st.success(f"target_namespace: {target_namespace}")
 
     root = ET.fromstring(xsd_content)
     
-    st.success(f"xsd_file_path: {xsd_file_path}")
+    #st.success(f"xsd_file_path: {xsd_file_path}")
     
     # Busca todos los elementos import
     xsd_import_elements = root.findall(".//xsd:import", namespaces)
 
     for import_element in xsd_import_elements:
         namespace = import_element.get('namespace')
-        st.success(f"namespace: {namespace}")
+        #st.success(f"namespace: {namespace}")
         if namespace == target_namespace:
             schema_location = import_element.get('schemaLocation')
-            st.success(f"Found xsd:import with namespace '{namespace}': {schema_location}")
+            #st.success(f"Found xsd:import with namespace '{namespace}': {schema_location}")
             
             # Concatena la ruta del archivo XSD principal con la ubicación del esquema importado
             absolute_schema_location = os.path.normpath(os.path.join(os.path.dirname(xsd_file_path), schema_location)).replace('\\', '/')
-            st.success(f"schema_location: {absolute_schema_location}")
+            #st.success(f"schema_location: {absolute_schema_location}")
             break  # Si encuentras la coincidencia, sal del bucle
     
     return absolute_schema_location  # Esto devolverá None si no se encontró coincidencia "
@@ -393,12 +393,12 @@ def get_correct_xsd_path(current_xsd_path, schema_location):
     Corrige la ruta de un XSD importado considerando los niveles de directorio.
     """
     base_path = os.path.dirname(current_xsd_path)  # Obtener la carpeta del XSD actual
-    st.success(f"base_path: {base_path}")
+    #st.success(f"base_path: {base_path}")
     corrected_path = os.path.abspath(os.path.join(base_path, schema_location))
-    st.success(f"corrected_path: {corrected_path}")    # Resolver la ruta correcta
+    #st.success(f"corrected_path: {corrected_path}")    # Resolver la ruta correcta
     corrected_path = corrected_path.replace("/mount/src/documentacion-osb/extraccion_jar","")
     corrected_path = corrected_path.replace(".xsd",".XMLSchema")
-    st.success(f"corrected_path: {corrected_path}")    # Resolver la ruta correcta
+    #st.success(f"corrected_path: {corrected_path}")    # Resolver la ruta correcta
 
     return corrected_path
 
@@ -423,7 +423,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     ruta_corregida = os.path.join(extraccion_dir, subcarpeta_xsd, os.path.basename(xsd_file_path))
     
-    st.success(f"Ruta corregida FINAL: {ruta_corregida}")
+    #st.success(f"Ruta corregida FINAL: {ruta_corregida}")
     
     if not os.path.isfile(ruta_corregida):
         st.error(f"El archivo XSD {ruta_corregida} no existe.")
@@ -437,7 +437,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', xsd_content, re.DOTALL)
     if cdata_match:
         xsd_content = cdata_match.group(1)
-        st.success("Se ha extraído el contenido de CDATA correctamente")
+        #st.success("Se ha extraído el contenido de CDATA correctamente")
 
     try:
         root = ET.fromstring(xsd_content)
@@ -448,8 +448,8 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     namespaces = extract_namespaces(xsd_content)
     imports = extract_imports(root)
 
-    st.success(f"Namespaces detectados: {namespaces}")
-    st.success(f"Imports encontrados: {imports}")
+    #st.success(f"Namespaces detectados: {namespaces}")
+    #st.success(f"Imports encontrados: {imports}")
 
     # 🔹 Verificar qué prefijos están en el namespaces
     valid_prefixes = [p for p in ['xs', 'xsd'] if p in namespaces]
@@ -460,7 +460,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🔹 Tomar el primer prefijo encontrado en namespaces (xs o xsd)
     prefix = valid_prefixes[0]
-    st.success(f"prefix: {prefix}")
+    #st.success(f"prefix: {prefix}")
 
     # 🔹 Buscar complexTypes con el prefijo detectado dinámicamente
     complex_types = {
@@ -477,7 +477,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🚀 **Si `target_complex_type` está definido, buscar SOLO ese complexType.**
     if target_complex_type:
-        st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
+        #st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
         explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                               operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -485,15 +485,15 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🔹 Si `target_complex_type` no está, procesamos TODO desde los elementos raíz.
     for root_element_name, complex_type in root_elements.items():
-        st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
+        #st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
 
         if complex_type in complex_types:
             explorar_complex_type(complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                   operations, service_name, operation_actual, request_elements, response_elements, operation_name)
 
-    st.success(f"Total elementos request: {len(request_elements)}")
-    st.success(f"Total elementos response: {len(response_elements)}")
+    #st.success(f"Total elementos request: {len(request_elements)}")
+    #st.success(f"Total elementos response: {len(response_elements)}")
     return request_elements, response_elements
 
 
@@ -505,7 +505,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
     type_name = type_name.split(':')[-1]  
 
     if type_name in complex_types:
-        st.success(f"Explorando complexType: {type_name}")
+        #st.success(f"Explorando complexType: {type_name}")
 
         # 🔹 Buscar un prefijo válido
         prefix = next((p for p in ['xs', 'xsd'] if p in namespaces), None)
@@ -519,7 +519,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             return
 
-        st.success(f"Usando prefijo: {prefix}")
+        #st.success(f"Usando prefijo: {prefix}")
 
         if prefix not in namespaces:
             st.error(f"⛔ Error: el prefijo '{prefix}' no está en namespaces: {namespaces}")
@@ -530,7 +530,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             element_type = element.attrib.get('type', '')
 
             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-            st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
+            #st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
             # 🔹 Buscar 'simpleType' con prefijo válido
             simple_type = element.find(f'{prefix}:simpleType', namespaces)
@@ -538,7 +538,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 restriction = simple_type.find(f'{prefix}:restriction', namespaces)
                 if restriction is not None and 'base' in restriction.attrib:
                     element_type = restriction.attrib['base']
-                    st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
+                    #st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
 
             if element_type.startswith(("xsd:", "xs:")):
                 element_details = {
@@ -552,7 +552,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     'service_name': service_name,
                     'operation_actual': operation_actual,
                 }
-                st.success(f"Agregando elemento primitivo: {element_details}")
+                #st.success(f"Agregando elemento primitivo: {element_details}")
 
                 if 'Request' in parent_element_name:
                     request_elements.append(element_details)
@@ -560,7 +560,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     response_elements.append(element_details)
 
             elif element_type in complex_types:
-                st.success(f"Buscando {element_type} en el mismo XSD")
+                #st.success(f"Buscando {element_type} en el mismo XSD")
                 explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                       xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                       operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -569,7 +569,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 prefix, nested_type = element_type.split(':')
                 
                 if nested_type in complex_types:
-                    st.success(f"Buscando {nested_type} en el mismo XSD")
+                    #st.success(f"Buscando {nested_type} en el mismo XSD")
                     explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                           operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -604,7 +604,7 @@ def leer_xsd_file(xsd_file_path, complexType_name):
             root = ET.fromstring(xsd_content)
             namespaces = {'xs': 'http://www.w3.org/2001/XMLSchema'}
             
-            st.success(f"xsd_file_path: {xsd_file_path}")
+            #st.success(f"xsd_file_path: {xsd_file_path}")
             print_with_line_number("")
 
             # Función para detectar y eliminar repeticiones cíclicas en los nombres de los elementos
@@ -632,8 +632,8 @@ def leer_xsd_file(xsd_file_path, complexType_name):
                         # Detectar y eliminar repeticiones cíclicas
                         full_element_name = remove_repetitions(full_element_name)
 
-                        st.success(f"element_name: {full_element_name}")
-                        st.success(f"element_type: {element_type}")
+                        #st.success(f"element_name: {full_element_name}")
+                        #st.success(f"element_type: {element_type}")
                         if not element_type:
                             element_type = 'xs:string'
                         elements_list.append({'element_name': full_element_name, 'element_type': element_type})
@@ -649,9 +649,9 @@ def leer_xsd_file(xsd_file_path, complexType_name):
             complex_type_element = root.find(f".//xs:complexType[@name='{complexType_name}']", namespaces)
             if complex_type_element is not None:
                 print_with_line_number("")
-                st.success(f"complex_type_name: {complexType_name}")
+                #st.success(f"complex_type_name: {complexType_name}")
                 print_with_line_number("")
-                st.success(f"complex_type_element: {complex_type_element}")
+                #st.success(f"complex_type_element: {complex_type_element}")
                 print_with_line_number("")
                 
                 visited = set()
@@ -674,7 +674,7 @@ def extract_project_name_from_proxy(proxy_path):
             wsdl_ref = content[start:end]
             return wsdl_ref.split("/")[0]
     except FileNotFoundError:
-        #st.success(f"El archivo {proxy_path} no existe.")
+        ##st.success(f"El archivo {proxy_path} no existe.")
         return None
 
 def reemplazar_texto_en_doc(doc, reemplazos):
@@ -756,51 +756,51 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
 
     osb_services = []
     elementos_xsd = []
-    #st.success(f"project_path: {project_path}")
+    ##st.success(f"project_path: {project_path}")
     for root, dirs, files in os.walk(project_path):
         if os.path.basename(root) == "Proxies":
-            #st.success(f"✅ Proxies {elementos_xsd}")
+            ##st.success(f"✅ Proxies {elementos_xsd}")
             for file in files:
                 if file.endswith('.ProxyService'):
                     osb_file_path = os.path.join(root, file)
-                    #st.success(f"✅ osb_file_path {osb_file_path}")
+                    ##st.success(f"✅ osb_file_path {osb_file_path}")
                     project_name = extract_project_name_from_proxy(osb_file_path)
-                    #st.success(f"✅ project_name {project_name}")
+                    ##st.success(f"✅ project_name {project_name}")
                     if project_name is None:
                         continue 
                     pipeline_path = extract_pipeline_path_from_proxy(osb_file_path, project_path)
-                    #st.success(f"✅ pipeline_path {pipeline_path}")
+                    ##st.success(f"✅ pipeline_path {pipeline_path}")
                     with open(osb_file_path, 'r', encoding="utf-8") as f:
                         content = f.read()
                         if has_http_provider_id(content):
                             service_name = os.path.splitext(file)[0]
-                            st.success(f"✅ service_name {service_name}")
+                            #st.success(f"✅ service_name {service_name}")
                             service_url = extract_service_url(content)
-                            st.success(f"✅ service_url {service_url}")
+                            #st.success(f"✅ service_url {service_url}")
                             wsdl_relative_path = extract_wsdl_relative_path(content)
-                            st.success(f"file: {file}")
-                            st.success(f"project_path: {project_path}")
-                            st.success(f"project_name: {project_name}")
-                            st.success(f"pipeline_path: {pipeline_path}")
+                            #st.success(f"file: {file}")
+                            #st.success(f"project_path: {project_path}")
+                            #st.success(f"project_name: {project_name}")
+                            #st.success(f"pipeline_path: {pipeline_path}")
                             
                             #operacion_business = service_refs_ruta_pipeline(pipeline_path,project_path)
                             operacion_business = ""
-                            st.success(f"operacion_business: {operacion_business}")
+                            #st.success(f"operacion_business: {operacion_business}")
                             
-                            st.success(f"service_name: {service_name}")
-                            st.success(f"service_url: {service_url}")
-                            st.success(f"wsdl_relative_path: {wsdl_relative_path}")
+                            #st.success(f"service_name: {service_name}")
+                            #st.success(f"service_url: {service_url}")
+                            #st.success(f"wsdl_relative_path: {wsdl_relative_path}")
                             if wsdl_relative_path:
                                 wsdl_path = os.path.join(project_path, wsdl_relative_path + ".WSDL")
                                 capa_proyecto = '/'+ wsdl_relative_path.split('/')[0]
                                 print_with_line_number("")
-                                st.success(f"capa_proyecto: {capa_proyecto}")
+                                #st.success(f"capa_proyecto: {capa_proyecto}")
                                 print_with_line_number("")
-                                st.success(f"wsdl_path: {wsdl_path}")
+                                #st.success(f"wsdl_path: {wsdl_path}")
                                 operations = extract_wsdl_operations(wsdl_path)
-                                st.success(f"operations: {operations}")
+                                #st.success(f"operations: {operations}")
                                 imports = extract_xsd_import_paths(wsdl_path)
-                                st.success(f"imports: {imports}")
+                                #st.success(f"imports: {imports}")
                                 #print_with_line_number("_________PRUEBA__________")
                                 #print_with_line_number("")
                                 
@@ -823,7 +823,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                                 operation_to_xsd[operation] = None  # No se encontró una coincidencia
                                         
                                 
-                                st.success(f"operation_to_xsd: {operation_to_xsd}")
+                                #st.success(f"operation_to_xsd: {operation_to_xsd}")
                                 
                                 # ✅ Si el usuario especificó una operación, verificar si existe en operation_to_xsd
                                 if operacion_a_documentar and operacion_a_documentar not in operation_to_xsd:
@@ -833,26 +833,26 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                     for operation_name, xsd in operation_to_xsd.items():
                                         #print_with_line_number("")
                                         operation_actual = operation_name
-                                        st.success(f"operation_actual: {operation_actual}")
-                                        st.success(f"operacion_a_documentar: {operacion_a_documentar}")
+                                        #st.success(f"operation_actual: {operation_actual}")
+                                        #st.success(f"operacion_a_documentar: {operacion_a_documentar}")
                                         if not operacion_a_documentar or operation_name == operacion_a_documentar:
-                                            st.success(f"operation_actual: {operation_actual}")
-                                            st.success(f"service_name: {service_name}")
-                                            st.success(f"operation_name: {operation_name}")
-                                            st.success(f"xsd: {xsd}")
-                                            st.success(f"service_url: {service_url}")
-                                            st.success(f"capa_proyecto: {capa_proyecto}")
-                                            st.success(f"operacion_business: {operacion_business}")
+                                            #st.success(f"operation_actual: {operation_actual}")
+                                            #st.success(f"service_name: {service_name}")
+                                            #st.success(f"operation_name: {operation_name}")
+                                            #st.success(f"xsd: {xsd}")
+                                            #st.success(f"service_url: {service_url}")
+                                            #st.success(f"capa_proyecto: {capa_proyecto}")
+                                            #st.success(f"operacion_business: {operacion_business}")
                                             xsd = os.path.splitext(xsd)[0] + ".XMLSchema"
                                             #print_with_line_number("")
                                             #print_with_line_number("")
                                         
                                             elementos_xsd = parse_xsd_file(project_path,xsd, operation_name,service_url,capa_proyecto,operacion_business,operations, service_name, operation_actual)
-                                            st.success(f"elementos_xsd: {elementos_xsd}")
+                                            #st.success(f"elementos_xsd: {elementos_xsd}")
                                             #elementos_completos = list(elementos_xsd) + list(operations) + [operation_actual]
                                             osb_services.append(elementos_xsd)
                                         
-    st.success(f"osb_services: {osb_services}")
+    #st.success(f"osb_services: {osb_services}")
     return osb_services
 
 def extraer_jar(archivo_jar):
@@ -888,7 +888,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     # Extraer ruta del proyecto desde el .jar
     jdeveloper_projects_dir = jar_path
     
-    st.success(f"✅ jdeveloper_projects_dir {jdeveloper_projects_dir}")
+    #st.success(f"✅ jdeveloper_projects_dir {jdeveloper_projects_dir}")
     
     if not jdeveloper_projects_dir:
         st.error("No se pudo determinar la ruta del proyecto desde el .jar.")
@@ -904,7 +904,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir,operacion_a_documentar)
     
-    st.success(f"✅ services_with_data {services_with_data}")
+    #st.success(f"✅ services_with_data {services_with_data}")
     
     es_type = False
     
@@ -920,7 +920,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 if 'Type' in element['elemento']:
                     es_type = True
                 #operation_name = element['elemento'].replace('Request', '').replace('Response', '').replace('Type', '')
-                #st.success(f"operation_name: {operation_name}")
+                ##st.success(f"operation_name: {operation_name}")
                 service_name = element['service_name']
                 # Agregar todas las operaciones de la lista 'operations'
                 if 'operations' in element:
@@ -931,9 +931,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         
         operaciones_formateadas = "\n".join(f"* {op}" for op in unique_operations)
         
-        st.success(f"unique_operations: {unique_operations}")
+        #st.success(f"unique_operations: {unique_operations}")
         
-        st.success(f"✅ unique_operations {unique_operations}")
+        #st.success(f"✅ unique_operations {unique_operations}")
         
         operation_elements = {}
         
@@ -981,8 +981,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 'service_name': service_name
             }
             
-        st.success(f"operation_elements: {operation_elements}")
-        #st.success(f"service_name: {service_name}")
+        #st.success(f"operation_elements: {operation_elements}")
+        ##st.success(f"service_name: {service_name}")
         # Print the result
         for operation, elements in operation_elements.items():
             
@@ -1001,11 +1001,11 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 # Contar el número de tablas en el documento
                 num_tables = len(doc.tables)
                 
-                st.success(f"El documento contiene {num_tables} tabla(s).")
+                #st.success(f"El documento contiene {num_tables} tabla(s).")
 
                 # Mostrar cada tabla
                 for i, table in enumerate(doc.tables):
-                    st.success(f"\nTabla {i+1}:")
+                    #st.success(f"\nTabla {i+1}:")
                     for row in table.rows:
                         row_data = [cell.text for cell in row.cells]
                         print_with_line_number('\t'.join(row_data))
@@ -1023,20 +1023,20 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 for elem in elements['business']:
                     business = elem['business']
                     
-                st.success(f"url: {url}")
+                #st.success(f"url: {url}")
                 print_with_line_number("")
-                st.success(f"ruta: {ruta}")
+                #st.success(f"ruta: {ruta}")
                 print_with_line_number("")
-                st.success(f"business: {business}")
+                #st.success(f"business: {business}")
                 print_with_line_number("")
                 fecha_actual = datetime.now()
                 fecha_formateada = fecha_actual.strftime("%d/%m/%Y")
                 
                 print_with_line_number("")
                 print_with_line_number("")
-                st.success(f"operation: {operation}")
+                #st.success(f"operation: {operation}")
                 
-                st.success(f"elements: {elements}")
+                #st.success(f"elements: {elements}")
                 print_with_line_number("")
                 print_with_line_number("")
                 
@@ -1062,8 +1062,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     # Añade más variables según sea necesario
                 }
                 
-                st.success(f"service_name: {service_name}")
-                st.success(f"variables: {variables}")
+                #st.success(f"service_name: {service_name}")
+                #st.success(f"variables: {variables}")
                 
                 tabla_cabecera_entrada_numero = 4
                 tabla_cabecera_entrada = doc.tables[tabla_cabecera_entrada_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
@@ -1081,14 +1081,14 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 # Variables de control
                 seccion_actual = None
                 
-                st.success(f"Número total de tablas en el documento: {len(doc.tables)}")
+                #st.success(f"Número total de tablas en el documento: {len(doc.tables)}")
                 
                 for i, table in enumerate(doc.tables):
-                    st.success(f"Tabla {i + 1}:")  # Mostrar el número de la tabla
+                    #st.success(f"Tabla {i + 1}:")  # Mostrar el número de la tabla
 
                     for row in table.rows:
                         row_text = [cell.text.strip() for cell in row.cells]  # Extraer el texto de cada celda
-                        st.success(f"  {row_text}")  # Imprimir el contenido de la fila
+                        #st.success(f"  {row_text}")  # Imprimir el contenido de la fila
 
                     print_with_line_number("-" * 50)  # Separador entre tablas
                
@@ -1155,18 +1155,18 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     # Rellenar la fila con los datos correspondientes
                     #fila[0].text = operation + "Request" + "." + elem['name']
                     fila[0].text = elem['name']
-                    st.success(f"fila[0].text: {fila[0].text}")
+                    #st.success(f"fila[0].text: {fila[0].text}")
                     fila[1].text = elem['name']
                     campo = fila[1].text.split('.')[-1]
                     fila[1].text = campo
-                    st.success(f"fila[1].text: {fila[1].text}")
+                    #st.success(f"fila[1].text: {fila[1].text}")
                     fila[2].text = default_longitud
                     fila[3].text = elem['type']
                     tipo_campo = fila[3].text.split(':')[-1]
                     if tipo_campo == 'string':
                         tipo_campo = 'Alfanumérico'
                     fila[3].text = tipo_campo
-                    st.success(f"fila[3].text: {fila[3].text}")
+                    #st.success(f"fila[3].text: {fila[3].text}")
                     
                     
                 # Limpiar la tabla antes de agregar elementos de esta operación
@@ -1184,23 +1184,23 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     # Rellenar la fila con los datos correspondientes
                     #fila[0].text = operation + "Response" + "." + elem['name']
                     fila[0].text = elem['name']
-                    st.success(f"fila[0].text: {fila[0].text}")
+                    #st.success(f"fila[0].text: {fila[0].text}")
                     fila[1].text = elem['name']
                     campo = fila[1].text.split('.')[-1]
                     fila[1].text = campo
-                    st.success(f"fila[1].text: {fila[1].text}")
+                    #st.success(f"fila[1].text: {fila[1].text}")
                     fila[2].text = default_longitud
                     fila[3].text = elem['type']
                     tipo_campo = fila[3].text.split(':')[-1]
                     if tipo_campo == 'string':
                         tipo_campo = 'Alfanumérico'
                     fila[3].text = tipo_campo
-                    st.success(f"fila[3].text: {fila[3].text}")
+                    #st.success(f"fila[3].text: {fila[3].text}")
 
                 print_with_line_number("___________________________________________")
                 
-                st.success(f"✅ temp_dir  {temp_dir }")
-                st.success(f"✅ ruta_temporal  {ruta_temporal }")
+                #st.success(f"✅ temp_dir  {temp_dir }")
+                #st.success(f"✅ ruta_temporal  {ruta_temporal }")
 
                 # Lista para almacenar las rutas de los documentos generados
                 documentos_generados = []
@@ -1218,7 +1218,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     
                 # Agregar a la lista de documentos generados
                 documentos_generados.append((ruta_guardado, os.path.join(ruta_proyecto, nombre_documento)))
-                st.success(f"Documento guardado: {ruta_guardado}")
+                #st.success(f"Documento guardado: {ruta_guardado}")
 
                 # Crear el archivo ZIP en memoria
                 zip_buffer = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
@@ -1228,7 +1228,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     for doc_path, zip_relative_path in documentos_generados:
                         zipf.write(doc_path, zip_relative_path)  # Mantener la estructura dentro del ZIP
 
-                st.success(f"ZIP creado: {zip_path}")
+                #st.success(f"ZIP creado: {zip_path}")
 
                 # Permitir la descarga del ZIP desde Streamlit
                 with open(zip_path, "rb") as file:
@@ -1241,7 +1241,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     mime="application/zip"
                 )
                     
-        st.success("Documentación generada con éxito!")
+        #st.success("Documentación generada con éxito!")
 
 def main():
     st.title("📄 Generador de Documentación OSB")
@@ -1266,7 +1266,7 @@ def main():
                 jar.extractall(carpeta_destino)
                 archivos_extraidos = jar.namelist()
             
-            st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
+            #st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
             st.write("📂 Archivos extraídos:")
             st.write(archivos_extraidos)
         except zipfile.BadZipFile:
