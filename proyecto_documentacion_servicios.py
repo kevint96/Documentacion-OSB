@@ -516,7 +516,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         # 🔹 Buscar 'sequence' con prefijo válido
         sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
         if sequence is None:
-            st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
+            #st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             return
 
         #st.success(f"Usando prefijo: {prefix}")
@@ -577,7 +577,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     namespace = namespaces[prefix]
                     if namespace in imports:
                         schema_location = imports[namespace]
-                        st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
+                        #st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
                         corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
                         new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
 
@@ -589,11 +589,11 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                                        request_elements=request_elements,
                                        response_elements=response_elements)
                     else:
-                        st.warning(f"No se encontró el namespace para el prefijo {prefix}")
+                        #st.warning(f"No se encontró el namespace para el prefijo {prefix}")
                 else:
-                    st.warning(f"complexType {element_type} no encontrado en el XSD")
+                    #st.warning(f"complexType {element_type} no encontrado en el XSD")
     else:
-        st.warning(f"complexType {type_name} no encontrado en el XSD")
+        #st.warning(f"complexType {type_name} no encontrado en el XSD")
 
 def leer_xsd_file(xsd_file_path, complexType_name):
     elements_list = []
@@ -992,7 +992,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 
                 if elements['request']:
                     
-                    st.success(f"Operacion: {operation}")
+                    st.success(f"🔍 Revisando operacion: {operation}")
                     
                     contiene_cabecera_entrada = False
                     contiene_cabecera_salida = False
@@ -1075,7 +1075,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     #st.success(f"variables: {variables}")
                     
                     total_tablas = len(doc.tables)
-                    st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
+                    #st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
                     
                     
                     tabla_cabecera_entrada_numero = 4
@@ -1233,18 +1233,20 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     
                     doc_nuevo = replace_text_in_doc(doc, variables)
                     doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
-                    st.success(f"📄 Documento guardado: {ruta_guardado}")
+                    st.success(f"📄 Documento guardado: ✅ {nombre_documento}")
                     
                     # 📌 Agregar el documento al ZIP
                     if os.path.exists(ruta_guardado):
                         zipf.write(ruta_guardado, os.path.join(ruta_proyecto, nombre_documento))
-                        st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
+                        #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
                     else:
-                        st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
+                        #st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:
             zip_bytes = file.read()
+
+        st.success("Documentación generada con éxito!")
 
         st.download_button(
             label="📥 Descargar TODOS los documentos en ZIP",
@@ -1253,8 +1255,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             mime="application/zip",
             key="download_all"
         )
-        st.success("Documentación generada con éxito!")
-        
+
 
 def main():
     st.title("📄 Generador de Documentación OSB")
