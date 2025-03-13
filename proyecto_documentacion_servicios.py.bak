@@ -866,6 +866,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                                 
                                 else:
                                     st.error("⛔ No se encuentra la operación en el .jar ⛔")
+                                    break
     #st.success(f"osb_services: {osb_services}")
     return osb_services
 
