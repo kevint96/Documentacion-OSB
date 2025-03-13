@@ -509,10 +509,16 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
 
         # 🔹 Buscar 'sequence' con ambos prefijos
         sequence = None
-        for prefix in ['xs', 'xsd']:
-            sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
-            if sequence is not None:
-                break  # Si ya encontró el sequence, no seguir buscando
+        for pref in ['xs', 'xsd']:
+            if pref in namespaces:
+                sequence = complex_types[type_name].find(f'{pref}:sequence', namespaces)
+                if sequence is not None:
+                    prefix = pref  # Usar el prefijo encontrado
+                    break
+
+        if sequence is None:
+            st.warning(f"No se encontró 'sequence' para {type_name}")
+            return
 
         if sequence is not None:
             for prefix in ['xs', 'xsd']:
