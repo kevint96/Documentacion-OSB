@@ -985,6 +985,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 
                 if elements['request']:
                     
+                    st.success(f"✅ Proyecto {elem['ruta']}")
                     st.success(f"🔍 Revisando operacion: {operation}")
                     
                     contiene_cabecera_entrada = False
