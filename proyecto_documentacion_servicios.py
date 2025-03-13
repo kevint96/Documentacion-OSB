@@ -402,15 +402,16 @@ def get_correct_xsd_path(current_xsd_path, schema_location):
 
     return corrected_path
 
-def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual):
-    request_elements = []
-    response_elements = []
+def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, operacion_business, operations, service_name, operation_actual, target_complex_type=None, root_element_name=None, request_elements=None, response_elements=None):
+    if request_elements is None:
+        request_elements = []
+    if response_elements is None:
+        response_elements = []
 
     if xsd_file_path.endswith('.XMLSchema') and os.path.isfile(xsd_file_path):
         with open(xsd_file_path, 'r', encoding="utf-8") as f:
             xsd_content = f.read()
             
-            # Extraer el contenido real del CDATA si está presente
             cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', xsd_content, re.DOTALL)
             if cdata_match:
                 xsd_content = cdata_match.group(1)
@@ -422,81 +423,99 @@ def parse_xsd_file(xsd_file_path, operation_name, service_url, capa_proyecto, op
                 st.error(f"Error al analizar el XMLSchema: {e}")
                 return request_elements, response_elements
             
-            # Detectar prefijos usados en el XMLSchema
-            namespaces = {'xs': 'http://www.w3.org/2001/XMLSchema', 'xsd': 'http://www.w3.org/2001/XMLSchema'}
-            valid_prefixes = [p for p in namespaces if any(root.findall(f".//{p}:complexType", namespaces))]
+            namespaces = {ns.split(':')[1]: ns.split('=')[1].strip('"') for ns in re.findall(r'xmlns:(\w+)="([^"]+)"', xsd_content)}
+            valid_prefixes = [p for p in ['xs', 'xsd'] if p in namespaces]
             if not valid_prefixes:
                 st.error("⛔ No se encontró un prefijo válido en el XSD")
                 return request_elements, response_elements
             
-            prefix = valid_prefixes[0]  # Usar el prefijo encontrado
+            prefix = valid_prefixes[0]  
             
             st.success(f"Procesando XSD: {xsd_file_path} con prefijo: {prefix}")
             
-            # Obtener todos los complexTypes en un diccionario
             complex_types = {elem.attrib.get('name', None): elem for elem in root.findall(f".//{prefix}:complexType", namespaces) if 'name' in elem.attrib}
             st.success(f"ComplexTypes encontrados: {list(complex_types.keys())}")
 
-            # Obtener los elementos principales del esquema
             elements = root.findall(f".//{prefix}:element", namespaces)
             
             if not elements:
                 st.warning("No se encontraron elementos principales en el XSD.")
 
-            # Explorar un complexType
             def explorar_complex_type(type_name, parent_element_name):
-                """Explora recursivamente un complexType y extrae sus elementos internos."""
-                type_name = type_name.split(':')[-1]  # Remover prefijo si existe
+                type_name = type_name.split(':')[-1]  
                 
                 if type_name in complex_types:
                     st.success(f"Explorando complexType: {type_name}")
-                    sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
+                    sequence = None
+                    for p in ['xs', 'xsd']:
+                        sequence = complex_types[type_name].find(f'{p}:sequence', namespaces)
+                        if sequence is not None:
+                            break
+                    
                     if sequence is not None:
-                        for element in sequence.findall(f'{prefix}:element', namespaces):
-                            element_name = element.attrib.get('name', '')
-                            element_type = element.attrib.get('type', '')
-
-                            full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-                            st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
-
-                            if element_type.startswith(("xsd:", "xs:")):
-                                element_details = {
-                                    'elemento': parent_element_name,  # Ahora tomamos el elemento raíz
-                                    'name': full_name,
-                                    'type': element_type,
-                                    'url': service_url,
-                                    'ruta': capa_proyecto,
-                                    'business': operacion_business,
-                                    'operations': operations,
-                                    'service_name': service_name,
-                                    'operation_actual': operation_actual,
-                                }
-                                st.success(f"Agregando elemento primitivo: {element_details}")
-                                if 'Request' in parent_element_name:
-                                    request_elements.append(element_details)
-                                elif 'Response' in parent_element_name:
-                                    response_elements.append(element_details)
-                            elif ':' in element_type or element_type in complex_types:
-                                nested_type = element_type.split(':')[-1]
-                                st.success(f"Elemento {full_name} tiene complexType anidado: {nested_type}")
-                                explorar_complex_type(nested_type, full_name)
-                            else:
-                                st.warning(f"complexType {element_type} no encontrado en el XSD")
+                        for p in ['xs', 'xsd']:
+                            for element in sequence.findall(f'{p}:element', namespaces):
+                                element_name = element.attrib.get('name', '')
+                                element_type = element.attrib.get('type', '')
+                                
+                                full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
+                                st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
+                                
+                                simple_type = None
+                                for p in ['xs', 'xsd']:
+                                    simple_type = element.find(f'{p}:simpleType', namespaces)
+                                    if simple_type is not None:
+                                        break
+                                
+                                if simple_type is not None:
+                                    restriction = None
+                                    for p in ['xs', 'xsd']:
+                                        restriction = simple_type.find(f'{p}:restriction', namespaces)
+                                        if restriction is not None and 'base' in restriction.attrib:
+                                            element_type = restriction.attrib['base']
+                                            st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
+                                            break
+                                
+                                if element_type.startswith(("xsd:", "xs:")):
+                                    element_details = {
+                                        'elemento': parent_element_name.split('.')[0],
+                                        'name': full_name,
+                                        'type': element_type,
+                                        'url': service_url,
+                                        'ruta': capa_proyecto,
+                                        'business': operacion_business,
+                                        'operations': operations,
+                                        'service_name': service_name,
+                                        'operation_actual': operation_actual,
+                                    }
+                                    st.success(f"Agregando elemento primitivo: {element_details}")
+                                    if 'Request' in parent_element_name:
+                                        request_elements.append(element_details)
+                                    elif 'Response' in parent_element_name:
+                                        response_elements.append(element_details)
+                                elif element_type in complex_types:
+                                    explorar_complex_type(element_type, full_name)
+                                elif ':' in element_type:
+                                    prefix, nested_type = element_type.split(':')
+                                    if nested_type in complex_types:
+                                        explorar_complex_type(nested_type, full_name)
+                                    else:
+                                        st.warning(f"complexType {element_type} no encontrado en el XSD")
                 else:
                     st.warning(f"complexType {type_name} no encontrado en el XSD")
 
-            # Iterar sobre los elementos principales del XSD
             for element in elements:
                 element_name = element.attrib.get('name', '')
                 element_type = element.attrib.get('type', '').split(':')[-1]
-
+                
                 if element_type in complex_types:
                     st.success(f"Iniciando exploración en {element_name} -> {element_type}")
-                    explorar_complex_type(element_type, element_name)  # Pasamos el nombre del {prefix}:element
-
+                    explorar_complex_type(element_type, element_name)
+    
     st.success(f"Total elementos request: {len(request_elements)}")
     st.success(f"Total elementos response: {len(response_elements)}")
     return request_elements, response_elements
+
 
 def leer_xsd_file(xsd_file_path, complexType_name):
     elements_list = []
