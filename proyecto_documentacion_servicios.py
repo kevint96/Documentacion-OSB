@@ -760,6 +760,8 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
 
     osb_services = []
     elementos_xsd = []
+    # Crear un diccionario de mapeo entre operations y imports basado en nombres de archivos
+    operation_to_xsd = {}
     ##st.success(f"project_path: {project_path}")
     for root, dirs, files in os.walk(project_path):
         if os.path.basename(root) == "Proxies":
@@ -810,8 +812,6 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                 #print_with_line_number("")
                                 
                                 
-                                # Crear un diccionario de mapeo entre operations y imports basado en nombres de archivos
-                                operation_to_xsd = {}
                                 for operation in operations:
                                     for xsd in imports:
                                         if operation.lower() in os.path.basename(xsd).lower():
