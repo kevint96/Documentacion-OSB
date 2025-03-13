@@ -863,6 +863,9 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                                 elementos_xsd = parse_xsd_file(project_path,xsd, operation_name,service_url,capa_proyecto,operacion_business,operations, service_name, operation_actual)
                                                 osb_services.append(elementos_xsd)
                                                 break
+                                                
+                                else:
+                                    st.error("⛔ No se encuentra la operación en el .jar ⛔")
     #st.success(f"osb_services: {osb_services}")
     return osb_services
 
