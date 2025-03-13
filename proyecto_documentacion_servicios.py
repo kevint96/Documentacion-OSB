@@ -777,6 +777,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
     elementos_xsd = []
     operations =[]
     operation_to_xsd = {}
+    found = False  # Variable para rastrear si se encuentra la operación
     ##st.success(f"project_path: {project_path}")
     for root, dirs, files in os.walk(project_path):
         if os.path.basename(root) == "Proxies":
@@ -847,15 +848,16 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                     
                                     # ✅ Si el usuario especificó una operación, verificar si existe en operation_to_xsd
                                     if operacion_a_documentar and operacion_a_documentar not in operation_to_xsd:
-                                        st.error("⛔ No se encuentra la operación en el .jar ⛔")
+                                        continue
                                     else:
+                                        found = True  # La operación se encontró en este archivo
                                         # Iterar sobre el diccionario y realizar la llamada a parse_xsd_file
                                         for operation_name, xsd in operation_to_xsd.items():
                                             #print_with_line_number("")
                                             operation_actual = operation_name
                                             #st.success(f"operation_actual: {operation_actual}")
                                             #st.success(f"operacion_a_documentar: {operacion_a_documentar}")
-                                            if not operacion_a_documentar:
+                                            if not operacion_a_documentar or operation_name == operacion_a_documentar::
                                                 #st.success(f"operation_actual: {operation_actual}")
                                                 st.success(f"🔍 Analizando operacion: {operation_actual}")
                                                 #st.success(f"service_name: {service_name}")
@@ -872,16 +874,13 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                                 #st.success(f"elementos_xsd: {elementos_xsd}")
                                                 #elementos_completos = list(elementos_xsd) + list(operations) + [operation_actual]
                                                 osb_services.append(elementos_xsd)
-                                            elif operation_name == operacion_a_documentar:
-                                                st.success(f"🔍 Analizando operacion: {operation_actual}")
-                                                xsd = os.path.splitext(xsd)[0] + ".XMLSchema"
-                                                elementos_xsd = parse_xsd_file(project_path,xsd, operation_name,service_url,capa_proyecto,operacion_business,operations, service_name, operation_actual)
-                                                osb_services.append(elementos_xsd)
-                                                return osb_services
+                                            
+                                                if operacion_a_documentar:
+                                                    return osb_services
                                                 
-                                else:
-                                    st.error("⛔ No se encuentra la operación en el .jar ⛔")
-                                    return
+    if not found:  
+        st.error("⛔ No se encuentra la operación en el .jar ⛔")
+
     #st.success(f"osb_services: {osb_services}")
     return osb_services
 

@@ -890,7 +890,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     """Función que ejecuta la generación de documentación."""
     
     zip_files = []
-    generoArchivo = false
+    generoArchivo = False
     
     # Extraer ruta del proyecto desde el .jar
     jdeveloper_projects_dir = jar_path
