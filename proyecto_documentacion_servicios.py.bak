@@ -468,10 +468,9 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
         if 'name' in elem.attrib
     }
 
-    # ✅ Buscar los elementos principales del XSD (Request y Response) con ambos prefijos
+    # 🔹 Buscar todos los elementos principales con el prefijo detectado
     root_elements = {
         elem.attrib.get('name', ''): elem.attrib.get('type', '').split(':')[-1]
-        for prefix in ['xs', 'xsd']  # Iterar sobre ambos prefijos
         for elem in root.findall(f".//{prefix}:element", namespaces)
     }
 
