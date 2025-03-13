@@ -425,7 +425,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     ruta_corregida = os.path.join(extraccion_dir, subcarpeta_xsd, os.path.basename(xsd_file_path))
     
-    st.success(f"Ruta corregida FINAL: {ruta_corregida}")
+    #st.success(f"Ruta corregida FINAL: {ruta_corregida}")
     
     if not os.path.isfile(ruta_corregida):
         st.error(f"El archivo XSD {ruta_corregida} no existe.")
@@ -439,7 +439,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     cdata_match = re.search(r'<!\[CDATA\[(.*?)\]\]>', xsd_content, re.DOTALL)
     if cdata_match:
         xsd_content = cdata_match.group(1)
-        st.success("Se ha extraído el contenido de CDATA correctamente")
+        #st.success("Se ha extraído el contenido de CDATA correctamente")
 
     try:
         root = ET.fromstring(xsd_content)
@@ -479,7 +479,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🚀 **Si `target_complex_type` está definido, buscar SOLO ese complexType.**
     if target_complex_type:
-        st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
+        #st.success(f"🔍 Buscando SOLO el complexType: {target_complex_type}")
         explorar_complex_type(target_complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
                               xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                               operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -487,7 +487,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🔹 Si `target_complex_type` no está, procesamos TODO desde los elementos raíz.
     for root_element_name, complex_type in root_elements.items():
-        st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
+        #st.success(f"Procesando raíz: {root_element_name} -> {complex_type}")
 
         if complex_type in complex_types:
             explorar_complex_type(complex_type, root_element_name, complex_types, namespaces, imports, extraccion_dir, 
@@ -507,7 +507,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
     type_name = type_name.split(':')[-1]  
 
     if type_name in complex_types:
-        st.success(f"Explorando complexType: {type_name}")
+        #st.success(f"Explorando complexType: {type_name}")
 
         # 🔹 Buscar un prefijo válido
         prefix = next((p for p in ['xs', 'xsd'] if p in namespaces), None)
@@ -519,6 +519,8 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
         if sequence is None:
             st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
+            st.success(f"Explorando complexType: {type_name}")
+            st.success(f"full_name: {full_name}")
             return
 
         #st.success(f"Usando prefijo: {prefix}")
@@ -532,7 +534,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             element_type = element.attrib.get('type', '')
 
             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-            st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
+            #st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
             # 🔹 Buscar 'simpleType' con prefijo válido
             simple_type = element.find(f'{prefix}:simpleType', namespaces)
@@ -540,7 +542,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 restriction = simple_type.find(f'{prefix}:restriction', namespaces)
                 if restriction is not None and 'base' in restriction.attrib:
                     element_type = restriction.attrib['base']
-                    st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
+                    #st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
 
             if element_type.startswith(("xsd:", "xs:")):
                 element_details = {
@@ -562,7 +564,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     response_elements.append(element_details)
 
             elif element_type in complex_types:
-                st.success(f"Buscando {element_type} en el mismo XSD")
+                #st.success(f"Buscando {element_type} en el mismo XSD")
                 explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                       xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                       operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -571,7 +573,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 prefix, nested_type = element_type.split(':')
                 
                 if nested_type in complex_types:
-                    st.success(f"Buscando {nested_type} en el mismo XSD")
+                    #st.success(f"Buscando {nested_type} en el mismo XSD")
                     explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                           operations, service_name, operation_actual, request_elements, response_elements, operation_name)
@@ -581,9 +583,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                         schema_location = imports[namespace]
                         #st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
                         corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
-                        st.success(f"corrected_xsd_path: {corrected_xsd_path}")
+                        #st.success(f"corrected_xsd_path: {corrected_xsd_path}")
                         new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
-                        st.success(f"new_xsd_path: {new_xsd_path}")
+                        #st.success(f"new_xsd_path: {new_xsd_path}")
 
                         parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
                                        capa_proyecto, operacion_business, operations, 
