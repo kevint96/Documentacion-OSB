@@ -450,8 +450,8 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
     namespaces = extract_namespaces(xsd_content)
     imports = extract_imports(root)
 
-    st.success(f"Namespaces detectados: {namespaces}")
-    st.success(f"Imports encontrados: {imports}")
+    #st.success(f"Namespaces detectados: {namespaces}")
+    #st.success(f"Imports encontrados: {imports}")
 
     # 🔹 Verificar qué prefijos están en el namespaces
     valid_prefixes = [p for p in ['xs', 'xsd'] if p in namespaces]
@@ -462,7 +462,7 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
 
     # 🔹 Tomar el primer prefijo encontrado en namespaces (xs o xsd)
     prefix = valid_prefixes[0]
-    st.success(f"prefix: {prefix}")
+    #st.success(f"prefix: {prefix}")
 
     # 🔹 Buscar complexTypes con el prefijo detectado dinámicamente
     complex_types = {
@@ -521,7 +521,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             return
 
-        st.success(f"Usando prefijo: {prefix}")
+        #st.success(f"Usando prefijo: {prefix}")
 
         if prefix not in namespaces:
             st.error(f"⛔ Error: el prefijo '{prefix}' no está en namespaces: {namespaces}")
@@ -554,7 +554,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     'service_name': service_name,
                     'operation_actual': operation_actual,
                 }
-                st.success(f"Agregando elemento primitivo: {element_details}")
+                #st.success(f"Agregando elemento primitivo: {element_details}")
 
                 if 'Request' in parent_element_name:
                     request_elements.append(element_details)
