@@ -23,6 +23,7 @@ import ast
 from datetime import datetime
 import difflib
 import glob
+import base64
 
 def print_with_line_number(msg):
     caller_frame = inspect.currentframe().f_back
@@ -1242,6 +1243,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             zip_bytes = file.read()
 
         st.success("Documentación generada con éxito!")
+        
+        # 🔹 Descargar automáticamente el ZIP sin necesidad de clic
+        auto_download_zip(zip_path)
 
         st.download_button(
             label="📥 Descargar TODOS los documentos en ZIP",
@@ -1250,6 +1254,21 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             mime="application/zip",
             key="download_all"
         )
+
+# Convertir el archivo ZIP a Base64
+def get_base64(file_path):
+    with open(file_path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+# Generar el enlace de descarga automático
+def auto_download_zip(zip_path, file_name="Documentos_Completos.zip"):
+    zip_base64 = get_base64(zip_path)
+    href = f'<a href="data:application/zip;base64,{zip_base64}" download="{file_name}" id="auto-download"></a>'
+    st.markdown(href, unsafe_allow_html=True)
+    st.markdown(
+        "<script>document.getElementById('auto-download').click();</script>",
+        unsafe_allow_html=True,
+    )
 
 
 def main():
