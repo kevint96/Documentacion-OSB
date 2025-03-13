@@ -828,7 +828,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                                     operation_to_xsd[operation] = None  # No se encontró una coincidencia
                                             
                                     
-                                    st.success(f"operation_to_xsd: {operation_to_xsd}")
+                                    #st.success(f"operation_to_xsd: {operation_to_xsd}")
                                     
                                     # ✅ Si el usuario especificó una operación, verificar si existe en operation_to_xsd
                                     if operacion_a_documentar and operacion_a_documentar not in operation_to_xsd:
@@ -980,7 +980,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 'service_name': service_name
             }
             
-        st.success(f"operation_elements: {operation_elements}")
+        #st.success(f"operation_elements: {operation_elements}")
         ##st.success(f"service_name: {service_name}")
         # Print the result
         # 📂 Crear un solo ZIP para todas las operaciones
@@ -993,7 +993,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 if elements['request']:
                     
                     st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
-                    st.success(f"🔍 Revisando operacion: {operation}")
+                    st.success(f"⏳ Creando documentacion operacion: {operation}")
                     
                     contiene_cabecera_entrada = False
                     contiene_cabecera_salida = False
@@ -1224,7 +1224,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     documentos_generados = []
 
                     ruta_proyecto = ruta.strip("/")  # Asegurar que la ruta no tenga "/" al inicio
-                    st.success(f"✅ ruta_proyecto  {ruta_proyecto }")
+                    #st.success(f"✅ ruta_proyecto  {ruta_proyecto }")
                     nombre_documento = f"Especificación Servicio WSDL {operation}.docx"
                     
                     # Crear la ruta dentro de la carpeta temporal
