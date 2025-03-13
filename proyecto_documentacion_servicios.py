@@ -893,10 +893,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     if not jdeveloper_projects_dir:
         st.error("No se pudo determinar la ruta del proyecto desde el .jar.")
         return
-    
-    # Cargar el documento de la plantilla
-    doc = Document(plantilla_path)
-    
+ 
     # Crear una carpeta temporal para almacenar los documentos
     temp_dir = tempfile.TemporaryDirectory()
     ruta_temporal = temp_dir.name  # Obtener la ruta temporal
@@ -997,6 +994,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 
                 if any('cabeceraSalida.' in elem['name'] for elem in elements['response']):
                     contiene_cabecera_salida = True
+                    
+                # Cargar el documento de la plantilla
+                doc = Document(plantilla_path)
                 
                 # Contar el número de tablas en el documento
                 num_tables = len(doc.tables)
@@ -1065,6 +1065,10 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 #st.success(f"service_name: {service_name}")
                 #st.success(f"variables: {variables}")
                 
+                total_tablas = len(doc.tables)
+                st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
+                
+                
                 tabla_cabecera_entrada_numero = 4
                 tabla_cabecera_entrada = doc.tables[tabla_cabecera_entrada_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
 
@@ -1073,6 +1077,10 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 
                 tabla_cabecera_salida_numero = 6
                 tabla_cabecera_salida = doc.tables[tabla_cabecera_salida_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
+                
+                if tabla_cabecera_salida_numero > total_tablas:
+                    st.error(f"⛔ Error: Se intentó acceder a la tabla {tabla_cabecera_salida_numero}, pero el documento solo tiene {total_tablas} tablas.")
+                    return  # Salir para evitar el error
                 
                 # Listas para almacenar las filas de cada subtabla
                 cabecera_salida = []

@@ -1218,7 +1218,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     
                 # Agregar a la lista de documentos generados
                 documentos_generados.append((ruta_guardado, os.path.join(ruta_proyecto, nombre_documento)))
-                #st.success(f"Documento guardado: {ruta_guardado}")
+                st.success(f"Documento guardado: {ruta_guardado}")
 
                 # Crear el archivo ZIP en memoria
                 zip_buffer = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
@@ -1228,7 +1228,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     for doc_path, zip_relative_path in documentos_generados:
                         zipf.write(doc_path, zip_relative_path)  # Mantener la estructura dentro del ZIP
 
-                #st.success(f"ZIP creado: {zip_path}")
+                st.success(f"ZIP creado: {zip_path}")
 
                 # Permitir la descarga del ZIP desde Streamlit
                 with open(zip_path, "rb") as file:
