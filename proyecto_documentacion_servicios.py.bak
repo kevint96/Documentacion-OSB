@@ -1249,10 +1249,11 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             zip_bytes = file.read()
 
         st.success("Documentación generada con éxito!")
-        
+
         # 🔹 Descargar automáticamente el ZIP sin necesidad de clic
         auto_download_zip(zip_path)
 
+        # 🔹 Opción manual en caso de que el auto-download no funcione
         st.download_button(
             label="📥 Descargar TODOS los documentos en ZIP",
             data=zip_bytes,
@@ -1261,20 +1262,29 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             key="download_all"
         )
 
+
 # Convertir el archivo ZIP a Base64
 def get_base64(file_path):
     with open(file_path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# Generar el enlace de descarga automático
 def auto_download_zip(zip_path, file_name="Documentos_Completos.zip"):
+    """Genera un enlace de descarga automático y lo ejecuta con JavaScript."""
     zip_base64 = get_base64(zip_path)
-    href = f'<a href="data:application/zip;base64,{zip_base64}" download="{file_name}" id="auto-download"></a>'
+    href = f'<a id="auto-download" href="data:application/zip;base64,{zip_base64}" download="{file_name}">📥 Descargar ZIP</a>'
+    
+    # 🔹 JavaScript para hacer clic automáticamente en el enlace después de 2 segundos
+    js_code = """
+    <script>
+        setTimeout(function() {
+            document.getElementById('auto-download').click();
+        }, 2000);
+    </script>
+    """
+
+    # 📌 Mostrar el enlace y ejecutar el script
     st.markdown(href, unsafe_allow_html=True)
-    st.markdown(
-        "<script>document.getElementById('auto-download').click();</script>",
-        unsafe_allow_html=True,
-    )
+    st.markdown(js_code, unsafe_allow_html=True)
 
 
 def main():

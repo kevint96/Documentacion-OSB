@@ -1250,42 +1250,17 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
 
         st.success("Documentación generada con éxito!")
 
-        # 🔹 Descargar automáticamente el ZIP sin necesidad de clic
-        auto_download_zip(zip_path)
+        # 🔹 Agregar un pequeño delay para asegurar que el ZIP esté listo
+        time.sleep(2)  # Esperar 2 segundos antes de mostrar la descarga
 
-        # 🔹 Opción manual en caso de que el auto-download no funcione
+        # 🔹 Descargar automáticamente el ZIP sin necesidad de clic
         st.download_button(
             label="📥 Descargar TODOS los documentos en ZIP",
             data=zip_bytes,
             file_name="Documentos_Completos.zip",
             mime="application/zip",
-            key="download_all"
+            key="download_all",
         )
-
-
-# Convertir el archivo ZIP a Base64
-def get_base64(file_path):
-    with open(file_path, "rb") as f:
-        return base64.b64encode(f.read()).decode()
-
-def auto_download_zip(zip_path, file_name="Documentos_Completos.zip"):
-    """Genera un enlace de descarga automático y lo ejecuta con JavaScript."""
-    zip_base64 = get_base64(zip_path)
-    href = f'<a id="auto-download" href="data:application/zip;base64,{zip_base64}" download="{file_name}">📥 Descargar ZIP</a>'
-    
-    # 🔹 JavaScript para hacer clic automáticamente en el enlace después de 2 segundos
-    js_code = """
-    <script>
-        setTimeout(function() {
-            document.getElementById('auto-download').click();
-        }, 2000);
-    </script>
-    """
-
-    # 📌 Mostrar el enlace y ejecutar el script
-    st.markdown(href, unsafe_allow_html=True)
-    st.markdown(js_code, unsafe_allow_html=True)
-
 
 def main():
     st.title("📄 Generador de Documentación OSB")
