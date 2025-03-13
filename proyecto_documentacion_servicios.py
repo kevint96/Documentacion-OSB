@@ -507,96 +507,91 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
     if type_name in complex_types:
         st.success(f"Explorando complexType: {type_name}")
 
-        # 🔹 Buscar 'sequence' con ambos prefijos
-        sequence = None
-        for pref in ['xs', 'xsd']:
-            if pref in namespaces:
-                sequence = complex_types[type_name].find(f'{pref}:sequence', namespaces)
-                if sequence is not None:
-                    prefix = pref  # Usar el prefijo encontrado
-                    break
-
+        # 🔹 Buscar un prefijo válido
+        prefix = next((p for p in ['xs', 'xsd'] if p in namespaces), None)
+        if not prefix:
+            st.error(f"⛔ No se encontró un prefijo válido en namespaces: {namespaces}")
+            return
+        
+        # 🔹 Buscar 'sequence' con prefijo válido
+        sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
         if sequence is None:
-            st.warning(f"No se encontró 'sequence' para {type_name}")
+            st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             return
 
-        if sequence is not None:
-            for prefix in ['xs', 'xsd']:
-                for element in sequence.findall(f'{prefix}:element', namespaces):
-                    element_name = element.attrib.get('name', '')
-                    element_type = element.attrib.get('type', '')
+        st.success(f"Usando prefijo: {prefix}")
 
-                    full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
-                    st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
+        if prefix not in namespaces:
+            st.error(f"⛔ Error: el prefijo '{prefix}' no está en namespaces: {namespaces}")
+            return
 
-                    # 🔹 Buscar 'simpleType' con ambos prefijos
-                    simple_type = None
-                    for p in ['xs', 'xsd']:
-                        simple_type = element.find(f'{p}:simpleType', namespaces)
-                        if simple_type is not None:
-                            break
+        for element in sequence.findall(f'{prefix}:element', namespaces):
+            element_name = element.attrib.get('name', '')
+            element_type = element.attrib.get('type', '')
 
-                    if simple_type is not None:
-                        restriction = None
-                        for p in ['xs', 'xsd']:
-                            restriction = simple_type.find(f'{p}:restriction', namespaces)
-                            if restriction is not None and 'base' in restriction.attrib:
-                                element_type = restriction.attrib['base']
-                                st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
-                                break
+            full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
+            st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
-                if element_type.startswith(("xsd:", "xs:")):
-                    element_details = {
-                        'elemento': parent_element_name.split('.')[0],  # 🔥 **Mantener solo el padre original**
-                        'name': full_name,  # 🔥 **Asegurar que incluya el contexto anterior**
-                        'type': element_type,
-                        'url': service_url,
-                        'ruta': capa_proyecto,
-                        'business': operacion_business,
-                        'operations': operations,
-                        'service_name': service_name,
-                        'operation_actual': operation_actual,
-                    }
-                    st.success(f"Agregando elemento primitivo: {element_details}")
+            # 🔹 Buscar 'simpleType' con prefijo válido
+            simple_type = element.find(f'{prefix}:simpleType', namespaces)
+            if simple_type is not None:
+                restriction = simple_type.find(f'{prefix}:restriction', namespaces)
+                if restriction is not None and 'base' in restriction.attrib:
+                    element_type = restriction.attrib['base']
+                    st.success(f"Elemento {full_name} tiene restricción con base: {element_type}")
 
-                    if 'Request' in parent_element_name:
-                        request_elements.append(element_details)
-                    elif 'Response' in parent_element_name:
-                        response_elements.append(element_details)
+            if element_type.startswith(("xsd:", "xs:")):
+                element_details = {
+                    'elemento': parent_element_name.split('.')[0],  
+                    'name': full_name,  
+                    'type': element_type,
+                    'url': service_url,
+                    'ruta': capa_proyecto,
+                    'business': operacion_business,
+                    'operations': operations,
+                    'service_name': service_name,
+                    'operation_actual': operation_actual,
+                }
+                st.success(f"Agregando elemento primitivo: {element_details}")
 
-                elif element_type in complex_types:
-                    st.success(f"Buscando {element_type} en el mismo XSD")
-                    explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
+                if 'Request' in parent_element_name:
+                    request_elements.append(element_details)
+                elif 'Response' in parent_element_name:
+                    response_elements.append(element_details)
+
+            elif element_type in complex_types:
+                st.success(f"Buscando {element_type} en el mismo XSD")
+                explorar_complex_type(element_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
+                                      xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
+                                      operations, service_name, operation_actual, request_elements, response_elements, operation_name)
+
+            elif ':' in element_type:
+                prefix, nested_type = element_type.split(':')
+                
+                if nested_type in complex_types:
+                    st.success(f"Buscando {nested_type} en el mismo XSD")
+                    explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
                                           xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                           operations, service_name, operation_actual, request_elements, response_elements, operation_name)
+                elif prefix in namespaces:
+                    namespace = namespaces[prefix]
+                    if namespace in imports:
+                        schema_location = imports[namespace]
+                        st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
+                        corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
+                        new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
 
-                elif ':' in element_type:
-                    prefix, nested_type = element_type.split(':')
-                    
-                    if nested_type in complex_types:
-                        st.success(f"Buscando {nested_type} en el mismo XSD")
-                        explorar_complex_type(nested_type, full_name, complex_types, namespaces, imports, extraccion_dir, 
-                                              xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
-                                              operations, service_name, operation_actual, request_elements, response_elements, operation_name)
-                    elif prefix in namespaces:
-                        namespace = namespaces[prefix]
-                        if namespace in imports:
-                            schema_location = imports[namespace]
-                            st.warning(f"El tipo {nested_type} está en otro XSD: {schema_location}")
-                            corrected_xsd_path = get_correct_xsd_path(xsd_file_path, schema_location)
-                            new_xsd_path = os.path.join(extraccion_dir, corrected_xsd_path)
-
-                            parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
-                                           capa_proyecto, operacion_business, operations, 
-                                           service_name, operation_actual, 
-                                           target_complex_type=nested_type, 
-                                           root_element_name=full_name,
-                                           request_elements=request_elements,
-                                           response_elements=response_elements)
-                        else:
-                            st.warning(f"No se encontró el namespace para el prefijo {prefix}")
+                        parse_xsd_file(project_path, new_xsd_path, operation_name, service_url, 
+                                       capa_proyecto, operacion_business, operations, 
+                                       service_name, operation_actual, 
+                                       target_complex_type=nested_type, 
+                                       root_element_name=full_name,
+                                       request_elements=request_elements,
+                                       response_elements=response_elements)
                     else:
-                        st.warning(f"complexType {element_type} no encontrado en el XSD")
+                        st.warning(f"No se encontró el namespace para el prefijo {prefix}")
+                else:
+                    st.warning(f"complexType {element_type} no encontrado en el XSD")
     else:
         st.warning(f"complexType {type_name} no encontrado en el XSD")
 
