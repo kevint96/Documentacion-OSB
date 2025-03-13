@@ -890,6 +890,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     """Función que ejecuta la generación de documentación."""
     
     zip_files = []
+    generoArchivo = false
     
     # Extraer ruta del proyecto desde el .jar
     jdeveloper_projects_dir = jar_path
@@ -1263,6 +1264,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                             #st.success(f"📄 Documento agregado al ZIP: {ruta_guardado}")
                         else:
                             st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
+                        
+                        generoArchivo = True
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:
