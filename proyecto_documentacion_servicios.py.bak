@@ -1029,7 +1029,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     match = difflib.get_close_matches(request_key, [elemento_nombre], n=1, cutoff=0.9)
                     
                     if match or request_key in elemento_nombre:  # Si hay coincidencia razonable
-                        request_elements.append({'name': element['name'], 'type': element['type']})
+                        request_elements.append({'name': element['name'], 'type': element['type'],'minOccurs': element['minOccurs']})
                         url_elements.append({'url': element['url']})
                         capa_proyecto.append({'ruta': element['ruta']})
                         minOccurs_elements.append({'minOccurs': element['minOccurs']})
@@ -1043,7 +1043,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     match = difflib.get_close_matches(response_key, [elemento_nombre], n=1, cutoff=0.9)
                     
                     if match or response_key in elemento_nombre:  
-                        response_elements.append({'name': element['name'], 'type': element['type']})
+                        response_elements.append({'name': element['name'], 'type': element['type'],'minOccurs': element['minOccurs']})
                         service_name = element['service_name']
             
             # Store the collected elements in the dictionary
