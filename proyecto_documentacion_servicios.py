@@ -1343,54 +1343,47 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
 
 def main():
     st.markdown(
-        "<h1 style='text-align: center;'>📄 Generador de Documentación OSB</h1>",
-        unsafe_allow_html=True
-    )
-
+    "<h1 style='text-align: center;'>📄 Generador de Documentación OSB</h1>",
+    unsafe_allow_html=True)
+    
     # Ruta donde se extraerán los archivos
     carpeta_destino = "extraccion_jar"
-
-    # 📌 Menú lateral
+    
+    # 📌 Agregar elementos al menú lateral
     with st.sidebar:
-        jar_file = st.file_uploader("📂 Sube el archivo .jar con dependencias", type=["jar"])
-        plantilla_file = st.file_uploader("📄 Sube la plantilla de Word", type=["docx"])
-        operacion_a_documentar = st.text_input("✏️ Operación a documentar")
+        jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
+        plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
+        operacion_a_documentar = st.text_input("Operacion")
         nombre_autor = st.text_input("👤 Nombre del autor", value="Kevin Torres")  # Valor por defecto
-
-        # ✅ Botón en la barra lateral
-        generar_doc = st.button("🚀 Generar Documentación")
-
-    # 📌 Procesar el archivo .jar si fue subido
+        generar_doc = st.button("Generar Documentación")
+            
     if jar_file:
         jar_path = "temp.jar"
 
         # Guardar el archivo
         with open(jar_path, "wb") as f:
             f.write(jar_file.getbuffer())
-
-        # 📂 Extraer los archivos del .jar
+            
+        # Extraer los archivos del .jar
         try:
             with zipfile.ZipFile(jar_path, "r") as jar:
                 jar.extractall(carpeta_destino)
                 archivos_extraidos = jar.namelist()
-
-            st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
-            st.write("📂 **Archivos extraídos:**")
+            
+            #st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
+            st.write("📂 Archivos extraídos:")
             st.write(archivos_extraidos)
         except zipfile.BadZipFile:
             st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
-
-    # 📌 Mostrar resultados en el centro
+            
     with st.container():
-        if generar_doc:  # ⬅️ Se activa solo cuando se presiona el botón
+        if generar_doc:
             if jar_file and plantilla_file and nombre_autor:
-                with st.spinner("⏳ Generando documentación..."):
-                    generar_documentacion(carpeta_destino, plantilla_file, operacion_a_documentar, nombre_autor)
+                with st.spinner("Generando documentación..."):
+                    generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar,nombre_autor)
             else:
-                st.error("⚠️ Por favor, sube todos los archivos y proporciona la información requerida.")
-
-if __name__ == "__main__":
-    main()
+                st.error("Por favor, sube todos los archivos, escribe el autor y proporciona la ruta de destino.")
+                
 
 if __name__ == "__main__":
     main()
