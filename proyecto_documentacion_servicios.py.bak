@@ -968,12 +968,14 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             st.warning("⚠️ No hay operaciones que documentar.")
             return
         
-        progress_bar_general = st.progress(0)
+        if total_operaciones > 1:
+            progress_bar_general = st.progress(0)
         
         # 🔹 Iterar sobre cada operación
         for idx, operation in enumerate(unique_operations, start=1):
-            progreso_actual = int((idx / total_operaciones) * 100)
-            progress_bar_general.progress(progreso_actual)  # 🔄 Actualizar barra general
+            if total_operaciones > 1:
+                progreso_actual = int((idx / total_operaciones) * 100)
+                progress_bar_general.progress(progreso_actual)  # 🔄 Actualizar barra general
 
             st.success(f"⏳ Procesando operación {idx}/{total_operaciones}: {operation} ({progreso_actual}%)")
             
@@ -1050,14 +1052,15 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                 # 🔹 Actualizar progreso de generación de documentos
                 if total_operaciones > 1:
                     progreso_actual = int(((idx + total_operaciones) / (total_operaciones * 2)) * 100)
-                else:
-                    progreso_actual = 15
-                progress_bar_general.progress(progreso_actual)
+                    progress_bar_general.progress(progreso_actual)
 
                 if elements['request']:
                     
                     st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
                     st.success(f"⏳ Creando documentacion operacion: {operation}")
+                    
+                    if total_operaciones == 1:
+                        progress_bar_general = st.progress(10)
                     
                     contiene_cabecera_entrada = False
                     contiene_cabecera_salida = False
@@ -1140,7 +1143,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     
                     total_tablas = len(doc.tables)
                     #st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
-                    
+                    if total_operaciones == 1:
+                        progress_bar_general = st.progress(30)
                     
                     tabla_cabecera_entrada_numero = 4
                     tabla_cabecera_entrada = doc.tables[tabla_cabecera_entrada_numero - 1]  # Las tablas se indexan desde 0, por eso restamos 1
