@@ -1342,7 +1342,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
         )
 
 def main():
-    st.title("📄 Generador de Documentación OSB")
+    st.markdown(
+    "<h1 style='text-align: center;'>📄 Generador de Documentación OSB</h1>",
+    unsafe_allow_html=True)
     
     # 📌 Agregar elementos al menú lateral
     with st.sidebar:
@@ -1350,7 +1352,15 @@ def main():
         plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
         operacion_a_documentar = st.text_input("Operacion")
         nombre_autor = st.text_input("👤 Nombre del autor", value="Kevin Torres")  # Valor por defecto
-        
+    
+        if st.button("Generar Documentación"):
+            if jar_file and plantilla_file:
+                with st.spinner("Generando documentación..."):
+                    generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar,nombre_autor)
+            else:
+                st.error("Por favor, sube todos los archivos y proporciona la ruta de destino.")
+                
+            
     if jar_file:
         jar_path = "temp.jar"
 
@@ -1372,13 +1382,6 @@ def main():
             st.write(archivos_extraidos)
         except zipfile.BadZipFile:
             st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
-    
-    if st.button("Generar Documentación"):
-        if jar_file and plantilla_file:
-            with st.spinner("Generando documentación..."):
-                generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar,nombre_autor)
-        else:
-            st.error("Por favor, sube todos los archivos y proporciona la ruta de destino.")
 
 if __name__ == "__main__":
     main()
