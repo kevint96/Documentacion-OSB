@@ -552,7 +552,10 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             element_minOccurs = element.attrib.get('minOccurs', '')
             if element_minOccurs is None:
                 element_minOccurs = 0
-
+           
+            st.success(f"element_name: {element_name}")
+            st.success(f"element_type: {element_type}")
+            st.success(f"element_minOccurs: {element_minOccurs}")
             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
             #st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 

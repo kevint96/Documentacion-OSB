@@ -553,9 +553,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
             if element_minOccurs is None:
                 element_minOccurs = 0
            
-            st.success(f"element_name: {element_name}")
-            st.success(f"element_type: {element_type}")
-            st.success(f"element_minOccurs: {element_minOccurs}")
+            #st.success(f"element_name: {element_name}")
+            #st.success(f"element_type: {element_type}")
+            #st.success(f"element_minOccurs: {element_minOccurs}")
             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
             #st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
 
@@ -1059,7 +1059,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                 'service_name': service_name
             }
             
-        #st.success(f"operation_elements: {operation_elements}")
+        st.success(f"operation_elements: {operation_elements}")
         ##st.success(f"service_name: {service_name}")
         # Print the result
         # 📂 Crear un solo ZIP para todas las operaciones
@@ -1073,6 +1073,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                 st.write(f"📌 Cantidad de elementos request: {len(elements['request'])}")
                 st.write(f"📌 Cantidad de elementos response: {len(elements['response'])}")
 
+                st.success(f"elements['request']: {elements['request']}")
                 if not elements['request']:
                     st.warning(f"⚠️ La operación {operation} no tiene elementos de entrada, saltando...")
                     continue  # Si no hay request, no genera el documento
