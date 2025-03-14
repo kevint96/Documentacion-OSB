@@ -549,6 +549,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         for element in sequence.findall(f'{prefix}:element', namespaces):
             element_name = element.attrib.get('name', '')
             element_type = element.attrib.get('type', '')
+            element_minOccurs = element.attrib.get('minOccurs', '')
+            if element_minOccurs is None:
+                element_minOccurs = 0
 
             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
             #st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
@@ -568,7 +571,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     'type': element_type,
                     'url': service_url,
                     'ruta': capa_proyecto,
-                    'minOccurs': operacion_business,
+                    'minOccurs': element_minOccurs,
                     'operations': operations,
                     'service_name': service_name,
                     'operation_actual': operation_actual,
@@ -1256,6 +1259,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     # Procesar los datos
                     for elem in elements['request']:
                         
+                        obligatorio = "NO"
                         #if 'cabeceraEntrada.' not in elem['name']:
                         # Añadir una nueva fila al final de la tabla
                         fila = tabla_request.add_row().cells
@@ -1268,7 +1272,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         campo = fila[1].text.split('.')[-1]
                         fila[1].text = campo
                         #st.success(f"fila[1].text: {fila[1].text}")
-                        fila[2].text = default_longitud
+                        if elem['minOccurs'] == 1
+                            obligatorio = "SI"
+                        fila[2].text = obligatorio
                         fila[3].text = elem['type']
                         tipo_campo = fila[3].text.split(':')[-1]
                         if tipo_campo == 'string':
@@ -1286,7 +1292,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     # Procesar los datos
                     for elem in elements['response']:
                         
-                        
+                        obligatorio = "NO"
                         #if 'cabeceraSalida.' not in elem['name']:
                         # Añadir una nueva fila al final de la tabla
                         fila = tabla_response.add_row().cells
@@ -1299,7 +1305,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         campo = fila[1].text.split('.')[-1]
                         fila[1].text = campo
                         #st.success(f"fila[1].text: {fila[1].text}")
-                        fila[2].text = default_longitud
+                        if elem['minOccurs'] == 1
+                            obligatorio = "SI"
+                        fila[2].text = obligatorio
                         fila[3].text = elem['type']
                         tipo_campo = fila[3].text.split(':')[-1]
                         if tipo_campo == 'string':
