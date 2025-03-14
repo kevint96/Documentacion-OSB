@@ -961,18 +961,16 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         
         operation_elements = {}
         
-        # 🔹 Iniciar la barra de progreso
-        progress_bar = st.progress(0)
+        
         total_operaciones = len(unique_operations) if unique_operations else 1
-        operaciones_procesadas = 0
         
         # Iterate through each unique operation
         for operation in unique_operations:
-            operaciones_procesadas += 1
-            porcentaje = int((operaciones_procesadas / total_operaciones) * 100)
-            progress_bar.progress(porcentaje)
             
             st.success(f"⏳ Procesando operación: {operation} ({porcentaje}%)")
+            # 🔹 Iniciar barra de progreso solo para esta operación
+            progress_bar = st.progress(0)
+            
             
             if es_type:
                 request_key = f"{operation}RequestType"
@@ -1047,6 +1045,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     
                     st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
                     st.success(f"⏳ Creando documentacion operacion: {operation}")
+                    progress_bar.progress(15)  # Inicia en 15%
                     
                     contiene_cabecera_entrada = False
                     contiene_cabecera_salida = False
@@ -1124,7 +1123,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         '{proyecto_abc}': 'TENENCIA_COMPORTAMIENTO_ABC'
                         # Añade más variables según sea necesario
                     }
-                    
+                    progress_bar.progress(30)
                     #st.success(f"service_name: {service_name}")
                     #st.success(f"variables: {variables}")
                     
@@ -1239,6 +1238,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         fila[3].text = tipo_campo
                         #st.success(f"fila[3].text: {fila[3].text}")
                         
+                        progress_bar.progress(60)  # Avance tras llenar request
                         
                     # Limpiar la tabla antes de agregar elementos de esta operación
                     while len(tabla_response.rows) > 2:
@@ -1268,6 +1268,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         fila[3].text = tipo_campo
                         #st.success(f"fila[3].text: {fila[3].text}")
 
+                    progress_bar.progress(85)  # Avance tras llenar response
+                    
                     print_with_line_number("___________________________________________")
                     
                     #st.success(f"✅ temp_dir  {temp_dir }")
@@ -1288,7 +1290,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     
                     doc_nuevo = replace_text_in_doc(doc, variables)
                     doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
-                    st.success(f"📄 Documento guardado: ✅ {nombre_documento}")
+                    st.success(f"📄 Documento generado: ✅ {nombre_documento}")
+                    progress_bar.progress(100)  # ¡Completado!
                     
                     # 📌 Agregar el documento al ZIP
                     if os.path.exists(ruta_guardado):
@@ -1298,8 +1301,6 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
                     
                     generoArchivo = True
-                    # Finalizar barra de progreso
-                    progress_bar.empty()
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:
