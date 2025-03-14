@@ -1061,7 +1061,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     st.success(f"⏳ Creando documentacion operacion: {operation}")
                     
                     if total_operaciones == 1:
-                        progress_bar_general = st.progress(10)
+                        progress_bar_general = st.progress(2)
                     
                     contiene_cabecera_entrada = False
                     contiene_cabecera_salida = False
