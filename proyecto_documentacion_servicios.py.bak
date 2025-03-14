@@ -1048,7 +1048,10 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     continue  # Si no hay request, no genera el documento
 
                 # 🔹 Actualizar progreso de generación de documentos
-                progreso_actual = int(((idx + total_operaciones) / (total_operaciones * 2)) * 100)
+                if total_operaciones > 1:
+                    progreso_actual = int(((idx + total_operaciones) / (total_operaciones * 2)) * 100)
+                else:
+                    progreso_actual = 15
                 progress_bar_general.progress(progreso_actual)
 
                 if elements['request']:
@@ -1245,7 +1248,10 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                             tipo_campo = 'Alfanumérico'
                         fila[3].text = tipo_campo
                         #st.success(f"fila[3].text: {fila[3].text}")
-                        
+                    
+                    if total_operaciones == 1:
+                        progress_bar_general.progress(50)
+                    
                     # Limpiar la tabla antes de agregar elementos de esta operación
                     while len(tabla_response.rows) > 2:
                         tabla_response._element.remove(tabla_response.rows[2]._element)
@@ -1272,7 +1278,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         if tipo_campo == 'string':
                             tipo_campo = 'Alfanumérico'
                         fila[3].text = tipo_campo
-
+                    
+                    if total_operaciones == 1:
+                        progress_bar_general.progress(75)
                     
                     print_with_line_number("___________________________________________")
                     
@@ -1295,6 +1303,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                     doc_nuevo = replace_text_in_doc(doc, variables)
                     doc_nuevo.save(ruta_guardado)  # Guardar en la carpeta temporal
                     st.success(f"📄 Documento generado: ✅ {nombre_documento}")
+                    
+                    if total_operaciones == 1:
+                        progress_bar_general.progress(100)
                     
                     
                     # 📌 Agregar el documento al ZIP
