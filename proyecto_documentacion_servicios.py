@@ -1346,6 +1346,9 @@ def main():
     "<h1 style='text-align: center;'>📄 Generador de Documentación OSB</h1>",
     unsafe_allow_html=True)
     
+    # Ruta donde se extraerán los archivos
+    carpeta_destino = "extraccion_jar"
+    
     # 📌 Agregar elementos al menú lateral
     with st.sidebar:
         jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
@@ -1354,11 +1357,11 @@ def main():
         nombre_autor = st.text_input("👤 Nombre del autor", value="Kevin Torres")  # Valor por defecto
     
         if st.button("Generar Documentación"):
-            if jar_file and plantilla_file:
+            if jar_file and plantilla_file and nombre_autor:
                 with st.spinner("Generando documentación..."):
                     generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar,nombre_autor)
             else:
-                st.error("Por favor, sube todos los archivos y proporciona la ruta de destino.")
+                st.error("Por favor, sube todos los archivos, escribe el autor y proporciona la ruta de destino.")
                 
             
     if jar_file:
@@ -1367,10 +1370,7 @@ def main():
         # Guardar el archivo
         with open(jar_path, "wb") as f:
             f.write(jar_file.getbuffer())
-
-        # Ruta donde se extraerán los archivos
-        carpeta_destino = "extraccion_jar"
-
+            
         # Extraer los archivos del .jar
         try:
             with zipfile.ZipFile(jar_path, "r") as jar:
