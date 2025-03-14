@@ -1409,15 +1409,19 @@ def main():
     
     # Ruta donde se extraerán los archivos
     carpeta_destino = "extraccion_jar"
+    operacion_a_documentar = ""
     
     # 📌 Agregar elementos al menú lateral
     with st.sidebar:
         jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
         plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
         if jar_file:
-            operacion_a_documentar = st.text_input("Operacion")
             operaciones = obtener_operaciones(carpeta_destino)
-            st.success(f"✅ operaciones {operaciones}")            
+            if operaciones:  # Solo mostrar si hay operaciones disponibles
+                operacion_a_documentar = st.selectbox("Selecciona una operación", operaciones)
+            else:
+                st.warning("⚠️ No se encontraron operaciones disponibles.")
+            operacion_a_documentar = None  # Para evitar errores si está vacío           
         nombre_autor = st.text_input("Nombre del autor", value="Kevin Torres")  # Valor por defecto
         generar_doc = st.button("Generar Documentación")
             

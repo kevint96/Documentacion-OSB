@@ -1396,7 +1396,9 @@ def obtener_operaciones(project_path):
                                 #st.success(f"wsdl_path: {wsdl_path}")
                                 operaciones_especificas = extract_wsdl_operations(wsdl_path)
                                 #st.success(f"operations: {operations}")
-                                operations.append(operaciones_especificas)
+                                
+                                for operation in operaciones_especificas:
+                                    operations.append(operation)
     return operations
 
 
