@@ -1349,27 +1349,29 @@ def main():
     
     carpeta_destino = os.path.join(UPLOAD_FOLDER, "extraccion_jar")  # 📂 Carpeta donde se extraerán los archivos
     
+    jar_path = None  # Inicializar variable para evitar errores
     if jar_file:
         jar_path = guardar_archivo(jar_file, "temp.jar")  # 🔹 Guardar JAR limpio
-
-        # 🔹 Extraer los archivos del .jar
-        try:
-            shutil.rmtree(carpeta_destino, ignore_errors=True)  # 🔥 Eliminar extracciones previas
-            os.makedirs(carpeta_destino, exist_ok=True)  # 📂 Crear carpeta limpia
-            
-            with zipfile.ZipFile(jar_path, "r") as jar:
-                jar.extractall(carpeta_destino)
-                archivos_extraidos = jar.namelist()
-            
-            st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
-            st.write("📂 Archivos extraídos:")
-            st.write(archivos_extraidos)
-        except zipfile.BadZipFile:
-            st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
+    
+        if jar_path:
+            # 🔹 Extraer los archivos del .jar
+            try:
+                shutil.rmtree(carpeta_destino, ignore_errors=True)  # 🔥 Eliminar extracciones previas
+                os.makedirs(carpeta_destino, exist_ok=True)  # 📂 Crear carpeta limpia
+                
+                with zipfile.ZipFile(jar_path, "r") as jar:
+                    jar.extractall(carpeta_destino)
+                    archivos_extraidos = jar.namelist()
+                
+                st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
+                st.write("📂 Archivos extraídos:")
+                st.write(archivos_extraidos)
+            except zipfile.BadZipFile:
+                st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
     
     # 📌 Botón para generar la documentación
     if st.button("📝 Generar Documentación"):
-        if jar_file and plantilla_file:
+        if jar_path and plantilla_file:
             with st.spinner("⏳ Generando documentación..."):
                 generar_documentacion(carpeta_destino, plantilla_file, operacion_a_documentar)
         else:
