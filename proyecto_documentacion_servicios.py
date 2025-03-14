@@ -549,6 +549,9 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         for element in sequence.findall(f'{prefix}:element', namespaces):
             element_name = element.attrib.get('name', '')
             element_type = element.attrib.get('type', '')
+            element_minOccurs = element.attrib.get('minOccurs', '')
+            if element_minOccurs is None:
+                element_minOccurs = 0
 
             full_name = f"{parent_element_name}.{element_name}" if parent_element_name else element_name
             #st.success(f"Encontrado elemento: {full_name} con tipo: {element_type}")
@@ -568,7 +571,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                     'type': element_type,
                     'url': service_url,
                     'ruta': capa_proyecto,
-                    'business': operacion_business,
+                    'minOccurs': element_minOccurs,
                     'operations': operations,
                     'service_name': service_name,
                     'operation_actual': operation_actual,
@@ -1014,7 +1017,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
             response_elements = []
             url_elements = []
             capa_proyecto = []
-            business_elements = []
+            minOccurs_elements = []
             
             # Iterate through services_with_data to find matching elements
             for request_data, response_data in services_with_data:
@@ -1029,7 +1032,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         request_elements.append({'name': element['name'], 'type': element['type']})
                         url_elements.append({'url': element['url']})
                         capa_proyecto.append({'ruta': element['ruta']})
-                        business_elements.append({'business': element['business']})
+                        minOccurs_elements.append({'minOccurs': element['minOccurs']})
                         service_name = element['service_name']
                 
                 # 🔹 Verificar si `response_key` está en `response_data['elemento']`
@@ -1049,7 +1052,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                 'response': response_elements,
                 'url': url_elements,
                 'ruta': capa_proyecto, 
-                'business': business_elements,
+                'minOccurs': minOccurs_elements,
                 'service_name': service_name
             }
             
@@ -1112,7 +1115,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     
                     url = ""
                     ruta =""
-                    business = ""
+                    minOccurs = ""
                     
                     for elem in elements['url']:
                         url = elem['url']
@@ -1120,8 +1123,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     for elem in elements['ruta']:
                         ruta = elem['ruta']
                     
-                    for elem in elements['business']:
-                        business = elem['business']
+                    for elem in elements['minOccurs']:
+                        minOccurs = elem['minOccurs']
                         
                     #st.success(f"url: {url}")
                     print_with_line_number("")
@@ -1157,7 +1160,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         '{autor}': nombre_autor,
                         '{autor2}': 'Julian Orjuela',
                         '{url}': url,
-                        '{operacion_legado}': business,
+                        '{operacion_legado}': minOccurs,
                         '{proyecto_abc}': 'TENENCIA_COMPORTAMIENTO_ABC'
                         # Añade más variables según sea necesario
                     }
@@ -1256,6 +1259,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     # Procesar los datos
                     for elem in elements['request']:
                         
+                        obligatorio = "NO"
                         #if 'cabeceraEntrada.' not in elem['name']:
                         # Añadir una nueva fila al final de la tabla
                         fila = tabla_request.add_row().cells
@@ -1268,11 +1272,13 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         campo = fila[1].text.split('.')[-1]
                         fila[1].text = campo
                         #st.success(f"fila[1].text: {fila[1].text}")
-                        fila[2].text = default_longitud
+                        if elem['minOccurs'] == 1
+                            obligatorio = "SI"
+                        fila[2].text = obligatorio
                         fila[3].text = elem['type']
                         tipo_campo = fila[3].text.split(':')[-1]
                         if tipo_campo == 'string':
-                            tipo_campo = 'Alfanumérico'
+                            tipo_campo = 'String'
                         fila[3].text = tipo_campo
                         #st.success(f"fila[3].text: {fila[3].text}")
                     
@@ -1286,7 +1292,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     # Procesar los datos
                     for elem in elements['response']:
                         
-                        
+                        obligatorio = "NO"
                         #if 'cabeceraSalida.' not in elem['name']:
                         # Añadir una nueva fila al final de la tabla
                         fila = tabla_response.add_row().cells
@@ -1299,11 +1305,13 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         campo = fila[1].text.split('.')[-1]
                         fila[1].text = campo
                         #st.success(f"fila[1].text: {fila[1].text}")
-                        fila[2].text = default_longitud
+                        if elem['minOccurs'] == 1
+                            obligatorio = "SI"
+                        fila[2].text = obligatorio
                         fila[3].text = elem['type']
                         tipo_campo = fila[3].text.split(':')[-1]
                         if tipo_campo == 'string':
-                            tipo_campo = 'Alfanumérico'
+                            tipo_campo = 'String'
                         fila[3].text = tipo_campo
                     
                     if total_operaciones == 1:
