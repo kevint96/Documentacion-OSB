@@ -967,7 +967,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         # Iterate through each unique operation
         for operation in unique_operations:
             
-            st.success(f"⏳ Procesando operación: {operation} ({porcentaje}%)")
+            st.success(f"⏳ Procesando operación: {operation}")
             # 🔹 Iniciar barra de progreso solo para esta operación
             progress_bar = st.progress(0)
             
