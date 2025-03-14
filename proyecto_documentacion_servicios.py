@@ -955,9 +955,20 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         #st.success(f"✅ unique_operations {unique_operations}")
         
         operation_elements = {}
-
+        
+        # 🔹 Iniciar la barra de progreso
+        progress_bar = st.progress(0)
+        total_operaciones = len(unique_operations) if unique_operations else 1
+        operaciones_procesadas = 0
+        
         # Iterate through each unique operation
         for operation in unique_operations:
+            operaciones_procesadas += 1
+            porcentaje = int((operaciones_procesadas / total_operaciones) * 100)
+            progress_bar.progress(porcentaje)
+            
+            st.success(f"⏳ Procesando operación: {operation} ({porcentaje}%)")
+            
             if es_type:
                 request_key = f"{operation}RequestType"
                 response_key = f"{operation}ResponseType"
@@ -1282,6 +1293,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         st.warning(f"⚠️ Documento no encontrado: {ruta_guardado}")
                     
                     generoArchivo = True
+                    # Finalizar barra de progreso
+                    progress_bar.empty()
                         
         # 📥 Permitir la descarga del ZIP final
         with open(zip_path, "rb") as file:
