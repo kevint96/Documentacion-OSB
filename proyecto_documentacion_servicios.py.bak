@@ -1447,7 +1447,7 @@ def main():
                 operacion_a_documentar = st.selectbox("Selecciona una operación", operaciones)
             else:
                 st.warning("⚠️ No se encontraron operaciones disponibles.")
-            operacion_a_documentar = None  # Para evitar errores si está vacío           
+                operacion_a_documentar = None  # Para evitar errores si está vacío           
         nombre_autor = st.text_input("Nombre del autor", value="Kevin Torres")  # Valor por defecto
         generar_doc = st.button("Generar Documentación")
          
