@@ -831,6 +831,8 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                 #print_with_line_number("_________PRUEBA__________")
                                 #print_with_line_number("")
                                 
+                                st.success(f"project_path: {project_path}")
+                                
                                 if operacion_a_documentar in operations or not operacion_a_documentar:
                                     for operation in operations:
                                         for xsd in imports:
