@@ -1416,6 +1416,32 @@ def main():
         jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
         plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
         if jar_file:
+            jar_path = "temp.jar"
+
+            # 🔥 Borrar contenido previo de la carpeta `extraccion_jar` solo si existe
+            if os.path.exists(carpeta_destino):
+                try:
+                    shutil.rmtree(carpeta_destino)  # Elimina la carpeta y su contenido
+                except Exception as e:
+                    print_with_line_number(f"⚠️ No se pudo limpiar la carpeta temporal: {e}")
+
+            # 📌 Crear nuevamente la carpeta vacía
+            os.makedirs(carpeta_destino, exist_ok=True)
+
+            # Guardar el nuevo archivo .jar
+            with open(jar_path, "wb") as f:
+                f.write(jar_file.getbuffer())
+
+            # 📂 Extraer los archivos del nuevo .jar
+            try:
+                with zipfile.ZipFile(jar_path, "r") as jar:
+                    jar.extractall(carpeta_destino)
+                    archivos_extraidos = jar.namelist()
+
+                #st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
+            except zipfile.BadZipFile:
+                st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
+            
             operaciones = obtener_operaciones(carpeta_destino)
             if operaciones:  # Solo mostrar si hay operaciones disponibles
                 operacion_a_documentar = st.selectbox("Selecciona una operación", operaciones)
@@ -1424,35 +1450,7 @@ def main():
             operacion_a_documentar = None  # Para evitar errores si está vacío           
         nombre_autor = st.text_input("Nombre del autor", value="Kevin Torres")  # Valor por defecto
         generar_doc = st.button("Generar Documentación")
-            
-    if jar_file:
-        jar_path = "temp.jar"
-
-        # 🔥 Borrar contenido previo de la carpeta `extraccion_jar` solo si existe
-        if os.path.exists(carpeta_destino):
-            try:
-                shutil.rmtree(carpeta_destino)  # Elimina la carpeta y su contenido
-            except Exception as e:
-                print_with_line_number(f"⚠️ No se pudo limpiar la carpeta temporal: {e}")
-
-        # 📌 Crear nuevamente la carpeta vacía
-        os.makedirs(carpeta_destino, exist_ok=True)
-
-        # Guardar el nuevo archivo .jar
-        with open(jar_path, "wb") as f:
-            f.write(jar_file.getbuffer())
-
-        # 📂 Extraer los archivos del nuevo .jar
-        try:
-            with zipfile.ZipFile(jar_path, "r") as jar:
-                jar.extractall(carpeta_destino)
-                archivos_extraidos = jar.namelist()
-
-            #st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
-        except zipfile.BadZipFile:
-            st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
-
-            
+         
     with st.container():
         if generar_doc:
             if jar_file and plantilla_file and nombre_autor:
