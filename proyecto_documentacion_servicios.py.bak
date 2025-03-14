@@ -950,6 +950,11 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         
         operaciones_formateadas = "\n".join(f"* {op}" for op in unique_operations)
         
+        
+        # 🔹 Si operacion_a_documentar tiene un valor, filtrar solo esa operación
+        if operacion_a_documentar:
+            unique_operations = [operacion_a_documentar] if operacion_a_documentar in unique_operations else []
+        
         #st.success(f"unique_operations: {unique_operations}")
         
         #st.success(f"✅ unique_operations {unique_operations}")
