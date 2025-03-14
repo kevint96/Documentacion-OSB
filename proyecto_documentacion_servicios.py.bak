@@ -1378,11 +1378,11 @@ def main():
             
     
     if st.button("Generar Documentación"):
-    if jar_file and plantilla_file and nombre_autor:
-        with st.spinner("Generando documentación..."):
-            generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar,nombre_autor)
-    else:
-        st.error("Por favor, sube todos los archivos, escribe el autor y proporciona la ruta de destino.")
+        if jar_file and plantilla_file and nombre_autor:
+            with st.spinner("Generando documentación..."):
+                generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar,nombre_autor)
+        else:
+            st.error("Por favor, sube todos los archivos, escribe el autor y proporciona la ruta de destino.")
                 
 
 if __name__ == "__main__":
