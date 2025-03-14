@@ -1359,27 +1359,31 @@ def main():
             
     if jar_file:
         jar_path = "temp.jar"
-        
-        # 🔥 Borrar contenido previo de la carpeta `extraccion_jar`
-        if os.path.exists(carpeta_destino):
-            shutil.rmtree(carpeta_destino)  # Elimina la carpeta y su contenido
-        os.makedirs(carpeta_destino, exist_ok=True)  # Crea la carpeta vacía nuevamente
 
-        # Guardar el archivo
+        # 🔥 Borrar contenido previo de la carpeta `extraccion_jar` solo si existe
+        if os.path.exists(carpeta_destino):
+            try:
+                shutil.rmtree(carpeta_destino)  # Elimina la carpeta y su contenido
+            except Exception as e:
+                st.error(f"⚠️ No se pudo limpiar la carpeta temporal: {e}")
+
+        # 📌 Crear nuevamente la carpeta vacía
+        os.makedirs(carpeta_destino, exist_ok=True)
+
+        # Guardar el nuevo archivo .jar
         with open(jar_path, "wb") as f:
             f.write(jar_file.getbuffer())
-            
-        # Extraer los archivos del .jar
+
+        # 📂 Extraer los archivos del nuevo .jar
         try:
             with zipfile.ZipFile(jar_path, "r") as jar:
                 jar.extractall(carpeta_destino)
                 archivos_extraidos = jar.namelist()
-            
-            #st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
-            #st.write("📂 Archivos extraídos:")
-            #st.write(archivos_extraidos)
+
+            st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
         except zipfile.BadZipFile:
             st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
+
             
     with st.container():
         if generar_doc:
