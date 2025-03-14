@@ -1443,8 +1443,12 @@ def main():
                 st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
             
             operaciones = obtener_operaciones(carpeta_destino)
+            # Agregar una opción vacía al inicio de la lista
+            operaciones.insert(0, "TODAS")
             if operaciones:  # Solo mostrar si hay operaciones disponibles
                 operacion_a_documentar = st.selectbox("Selecciona una operación", operaciones)
+            elif operacion_a_documentar == "TODAS":
+                operacion_a_documentar = None
             else:
                 st.warning("⚠️ No se encontraron operaciones disponibles.")
                 operacion_a_documentar = None  # Para evitar errores si está vacío           
