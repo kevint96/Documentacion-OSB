@@ -519,7 +519,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
         # 🔹 Buscar 'sequence' con prefijo válido
         sequence = complex_types[type_name].find(f'{prefix}:sequence', namespaces)
         if sequence is None:
-            st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
+            #st.warning(f"⚠ No se encontró 'sequence' en {type_name}")
             
             complex_content = complex_types[type_name].find(f'{prefix}:complexContent', namespaces)
             if complex_content is not None:
@@ -527,7 +527,7 @@ def explorar_complex_type(type_name, parent_element_name, complex_types, namespa
                 if extension is not None and 'base' in extension.attrib:
                     base_type = extension.attrib['base'].split(":")[-1]  # Obtener el nombre sin prefijo
                     
-                    st.success(f"🔄 {type_name} extiende {base_type}, explorando {base_type}...")
+                    #st.success(f"🔄 {type_name} extiende {base_type}, explorando {base_type}...")
                     explorar_complex_type(base_type, parent_element_name, complex_types, namespaces, imports, 
                                           extraccion_dir, xsd_file_path, project_path, service_url, capa_proyecto, 
                                           operacion_business, operations, service_name, operation_actual, 
@@ -912,13 +912,13 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         if os.path.exists(temp_dir):
             try:
                 shutil.rmtree(temp_dir)  # 🔥 Borra todo el contenido anterior
-                st.warning("📂 Se limpiaron los archivos temporales previos.")
+                #st.warning("📂 Se limpiaron los archivos temporales previos.")
             except Exception as e:
                 st.error(f"⛔ No se pudo eliminar la carpeta temporal: {e}")
 
         # 📌 Crear nuevamente la carpeta temporal limpia
         os.makedirs(temp_dir, exist_ok=True)
-        st.success(f"📂 Carpeta temporal creada: {temp_dir}")
+        #st.success(f"📂 Carpeta temporal creada: {temp_dir}")
     
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir,operacion_a_documentar)
