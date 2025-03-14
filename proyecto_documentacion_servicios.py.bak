@@ -1354,7 +1354,7 @@ def main():
         jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
         plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
         operacion_a_documentar = st.text_input("Operacion")
-        nombre_autor = st.text_input("👤 Nombre del autor", value="Kevin Torres")  # Valor por defecto
+        nombre_autor = st.text_input("Nombre del autor", value="Kevin Torres")  # Valor por defecto
         generar_doc = st.button("Generar Documentación")
             
     if jar_file:
@@ -1371,8 +1371,8 @@ def main():
                 archivos_extraidos = jar.namelist()
             
             #st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
-            st.write("📂 Archivos extraídos:")
-            st.write(archivos_extraidos)
+            #st.write("📂 Archivos extraídos:")
+            #st.write(archivos_extraidos)
         except zipfile.BadZipFile:
             st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
             

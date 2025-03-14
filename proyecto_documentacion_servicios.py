@@ -1359,6 +1359,11 @@ def main():
             
     if jar_file:
         jar_path = "temp.jar"
+        
+        # 🔥 Borrar contenido previo de la carpeta `extraccion_jar`
+        if os.path.exists(carpeta_destino):
+            shutil.rmtree(carpeta_destino)  # Elimina la carpeta y su contenido
+        os.makedirs(carpeta_destino, exist_ok=True)  # Crea la carpeta vacía nuevamente
 
         # Guardar el archivo
         with open(jar_path, "wb") as f:
