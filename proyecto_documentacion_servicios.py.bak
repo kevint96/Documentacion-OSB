@@ -1272,7 +1272,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         campo = fila[1].text.split('.')[-1]
                         fila[1].text = campo
                         #st.success(f"fila[1].text: {fila[1].text}")
-                        if elem['minOccurs'] == 1
+                        if elem['minOccurs'] == 1:
                             obligatorio = "SI"
                         fila[2].text = obligatorio
                         fila[3].text = elem['type']
@@ -1305,7 +1305,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         campo = fila[1].text.split('.')[-1]
                         fila[1].text = campo
                         #st.success(f"fila[1].text: {fila[1].text}")
-                        if elem['minOccurs'] == 1
+                        if elem['minOccurs'] == 1:
                             obligatorio = "SI"
                         fila[2].text = obligatorio
                         fila[3].text = elem['type']
