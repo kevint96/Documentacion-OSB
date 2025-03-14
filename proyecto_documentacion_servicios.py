@@ -1089,10 +1089,11 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     
                     if any('cabeceraEntrada.seguridad' in elem['name'] for elem in elements['request']):
                         print_with_line_number("Se encontró al menos un elemento con '.cabeceraEntrada.seguridad'")
-                        contiene_cabecera_entrada = True
+                        #contiene_cabecera_entrada = True
                     
                     if any('cabeceraSalida.' in elem['name'] for elem in elements['response']):
-                        contiene_cabecera_salida = True
+                        print_with_line_number("Se encontró al menos un elemento con '.cabeceraEntrada.seguridad'")
+                        #contiene_cabecera_salida = True
                         
                     # Cargar el documento de la plantilla
                     doc = Document(plantilla_path)
@@ -1362,6 +1363,43 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
             key="download_all",
         )
 
+
+def obtener_operaciones(project_path):
+
+    operations =[]
+    for root, dirs, files in os.walk(project_path):
+        if os.path.basename(root) == "Proxies":
+            ##st.success(f"✅ Proxies {elementos_xsd}")
+            for file in files:
+                if file.endswith('.ProxyService'):
+                    osb_file_path = os.path.join(root, file)
+                    #st.success(f"✅ osb_file_path {osb_file_path}")
+                    project_name = extract_project_name_from_proxy(osb_file_path)
+                    
+                    if project_name is None:
+                        continue 
+                    pipeline_path = extract_pipeline_path_from_proxy(osb_file_path, project_path)
+                    ##st.success(f"✅ pipeline_path {pipeline_path}")
+                    with open(osb_file_path, 'r', encoding="utf-8") as f:
+                        content = f.read()
+                        if has_http_provider_id(content):
+                            service_name = os.path.splitext(file)[0]
+                            service_url = extract_service_url(content)
+                            wsdl_relative_path = extract_wsdl_relative_path(content)
+                            operacion_business = ""
+                            if wsdl_relative_path:
+                                wsdl_path = os.path.join(project_path, wsdl_relative_path + ".WSDL")
+                                capa_proyecto = '/'+ wsdl_relative_path.split('/')[0]
+                                print_with_line_number("")
+                                #st.success(f"capa_proyecto: {capa_proyecto}")
+                                print_with_line_number("")
+                                #st.success(f"wsdl_path: {wsdl_path}")
+                                operaciones_especificas = extract_wsdl_operations(wsdl_path)
+                                #st.success(f"operations: {operations}")
+                                operations.append(operaciones_especificas)
+    return operations
+
+
 def main():
     st.markdown(
     "<h1 style='text-align: center;'>📄 Generador de Documentación OSB</h1>",
@@ -1374,7 +1412,10 @@ def main():
     with st.sidebar:
         jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
         plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
-        operacion_a_documentar = st.text_input("Operacion")
+        if jar_file:
+            operacion_a_documentar = st.text_input("Operacion")
+            operaciones = obtener_operaciones(carpeta_destino)
+            st.success(f"✅ operaciones {operaciones}")            
         nombre_autor = st.text_input("Nombre del autor", value="Kevin Torres")  # Valor por defecto
         generar_doc = st.button("Generar Documentación")
             
@@ -1386,7 +1427,7 @@ def main():
             try:
                 shutil.rmtree(carpeta_destino)  # Elimina la carpeta y su contenido
             except Exception as e:
-                st.error(f"⚠️ No se pudo limpiar la carpeta temporal: {e}")
+                print_with_line_number(f"⚠️ No se pudo limpiar la carpeta temporal: {e}")
 
         # 📌 Crear nuevamente la carpeta vacía
         os.makedirs(carpeta_destino, exist_ok=True)
