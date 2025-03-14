@@ -495,8 +495,8 @@ def parse_xsd_file(project_path, xsd_file_path, operation_name, service_url, cap
                                   xsd_file_path, project_path, service_url, capa_proyecto, operacion_business, 
                                   operations, service_name, operation_actual, request_elements, response_elements, operation_name)
 
-    st.success(f"Total elementos request: {len(request_elements)}")
-    st.success(f"Total elementos response: {len(response_elements)}")
+    #st.success(f"Total elementos request: {len(request_elements)}")
+    #st.success(f"Total elementos response: {len(response_elements)}")
     return request_elements, response_elements
 
 
@@ -1042,7 +1042,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             for idx, (operation, elements) in enumerate(operation_elements.items(), start=1):
                 
-                st.write(f"🔹 Procesando operación: {operation}")
+                #st.write(f"🔹 Procesando operación: {operation}")
                 st.write(f"📌 Cantidad de elementos request: {len(elements['request'])}")
                 st.write(f"📌 Cantidad de elementos response: {len(elements['response'])}")
 
@@ -1057,11 +1057,11 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
 
                 if elements['request']:
                     
-                    st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
-                    st.success(f"⏳ Creando documentacion operacion: {operation}")
+                    st.write(f"🔹 Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
+                    st.write(f"⏳ Creando documentacion operacion: {operation}")
                     
-                    if total_operaciones == 1:
-                        progress_bar_general = st.progress(2)
+                    #if total_operaciones == 1:
+                        #progress_bar_general = st.progress(2)
                     
                     contiene_cabecera_entrada = False
                     contiene_cabecera_salida = False
