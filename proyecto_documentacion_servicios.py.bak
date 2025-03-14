@@ -1057,8 +1057,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
 
                 if elements['request']:
                     
-                    st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
-                    st.success(f"⏳ Creando documentacion operacion: {operation}")
+                    st.write(f"🔹 Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
+                    st.write(f"⏳ Creando documentacion operacion: {operation}")
                     
                     #if total_operaciones == 1:
                         #progress_bar_general = st.progress(2)
@@ -1344,10 +1344,13 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
 def main():
     st.title("📄 Generador de Documentación OSB")
     
-    jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
-    plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
-    operacion_a_documentar = st.text_input("Operacion")
-    
+    # 📌 Agregar elementos al menú lateral
+    with st.sidebar:
+        jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
+        plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
+        operacion_a_documentar = st.text_input("Operacion")
+        nombre_autor = st.text_input("👤 Nombre del autor", value="Kevin Torres")  # Valor por defecto
+        
     if jar_file:
         jar_path = "temp.jar"
 

@@ -886,7 +886,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
     return osb_services
 
 
-def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
+def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre_autor):
     """Función que ejecuta la generación de documentación."""
     
     zip_files = []
@@ -1131,8 +1131,8 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
                         '{nombre_servicio_contrato2}': service_name,
                         '{nombre_servicio_tabla}': operation,
                         '{fecha}': fecha_formateada,
-                        '{autor_inicial}': 'Kevin Torres',
-                        '{autor}': 'Kevin Torres',
+                        '{autor_inicial}': nombre_autor,
+                        '{autor}': nombre_autor,
                         '{autor2}': 'Julian Orjuela',
                         '{url}': url,
                         '{operacion_legado}': business,
@@ -1344,10 +1344,13 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
 def main():
     st.title("📄 Generador de Documentación OSB")
     
-    jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
-    plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
-    operacion_a_documentar = st.text_input("Operacion")
-    
+    # 📌 Agregar elementos al menú lateral
+    with st.sidebar:
+        jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
+        plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
+        operacion_a_documentar = st.text_input("Operacion")
+        nombre_autor = st.text_input("👤 Nombre del autor", value="Kevin Torres")  # Valor por defecto
+        
     if jar_file:
         jar_path = "temp.jar"
 
@@ -1373,7 +1376,7 @@ def main():
     if st.button("Generar Documentación"):
         if jar_file and plantilla_file:
             with st.spinner("Generando documentación..."):
-                generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar)
+                generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar,nombre_autor)
         else:
             st.error("Por favor, sube todos los archivos y proporciona la ruta de destino.")
 
