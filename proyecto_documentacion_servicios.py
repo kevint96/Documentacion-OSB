@@ -833,6 +833,21 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                 #print_with_line_number("")
                                 
                                 #st.success(f"project_path: {project_path}")
+                                # 🔹 Eliminar 'extraccion_jar/' para obtener la ruta relativa base
+                                wsdl_relative_base = os.path.relpath(wsdl_path, "extraccion_jar")
+                                st.success(f"wsdl_relative_base: {wsdl_relative_base}")
+                                # 🔹 Obtener la carpeta donde está el WSDL
+                                wsdl_dir = os.path.dirname(wsdl_relative_base)
+                                st.success(f"wsdl_dir: {wsdl_dir}")
+                                # 🔹 Procesar cada import y ajustar solo los que empiezan con "../Schemas"
+                                xsd_relative_paths = []
+                                # 🔹 Modificar `imports` en su lugar
+                                for i, imp in enumerate(imports):
+                                    if imp.startswith("../Schemas"):  # Solo modificar los que empiezan con "../Schemas"
+                                        imports[i] = os.path.normpath(os.path.join(wsdl_dir, imp))  # Reemplazar en la misma lista
+                                                                    
+                                
+                                st.success(f"imports despues: {imports}")
                                 
                                 if operacion_a_documentar in operations or not operacion_a_documentar:
                                     for operation in operations:

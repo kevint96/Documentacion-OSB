@@ -806,9 +806,9 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                             #st.success(f"✅ service_url {service_url}")
                             wsdl_relative_path = extract_wsdl_relative_path(content)
                             #st.success(f"file: {file}")
-                            #st.success(f"project_path: {project_path}")
-                            #st.success(f"project_name: {project_name}")
-                            #st.success(f"pipeline_path: {pipeline_path}")
+                            st.success(f"project_path: {project_path}")
+                            st.success(f"project_name: {project_name}")
+                            st.success(f"pipeline_path: {pipeline_path}")
                             
                             #operacion_business = service_refs_ruta_pipeline(pipeline_path,project_path)
                             operacion_business = ""
@@ -827,11 +827,12 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                 operations = extract_wsdl_operations(wsdl_path)
                                 #st.success(f"operations: {operations}")
                                 imports = extract_xsd_import_paths(wsdl_path)
+                                st.success(f"wsdl_path: {wsdl_path}")
                                 st.success(f"imports: {imports}")
                                 #print_with_line_number("_________PRUEBA__________")
                                 #print_with_line_number("")
                                 
-                                st.success(f"project_path: {project_path}")
+                                #st.success(f"project_path: {project_path}")
                                 
                                 if operacion_a_documentar in operations or not operacion_a_documentar:
                                     for operation in operations:
