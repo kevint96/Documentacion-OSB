@@ -24,6 +24,7 @@ from datetime import datetime
 import difflib
 import glob
 import base64
+import sys
 
 def print_with_line_number(msg):
     caller_frame = inspect.currentframe().f_back
@@ -922,7 +923,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
     # Llamar a la función principal de tu script
     services_with_data = extract_osb_services_with_http_provider_id(jdeveloper_projects_dir,operacion_a_documentar)
     
-    st.write(f"✅ services_with_data {services_with_data}")
+    sys.stdout.write(f"✅ services_with_data {services_with_data}")
     
     es_type = False
     

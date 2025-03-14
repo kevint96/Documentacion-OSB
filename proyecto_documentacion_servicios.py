@@ -955,8 +955,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         #st.success(f"✅ unique_operations {unique_operations}")
         
         operation_elements = {}
-        
-        
+
         # Iterate through each unique operation
         for operation in unique_operations:
             if es_type:
@@ -975,18 +974,28 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             
             # Iterate through services_with_data to find matching elements
             for request_data, response_data in services_with_data:
+                #st.success(f"request_data: {request_data}")
                 # Check for request elements
                 for element in request_data:
-                    if request_key in element['elemento']:
+                    elemento_nombre = element['elemento']
+                    # ✅ Verificar coincidencia exacta o parcial usando difflib
+                    match = difflib.get_close_matches(request_key, [elemento_nombre], n=1, cutoff=0.9)
+                    
+                    if match or request_key in elemento_nombre:  # Si hay coincidencia razonable
                         request_elements.append({'name': element['name'], 'type': element['type']})
                         url_elements.append({'url': element['url']})
                         capa_proyecto.append({'ruta': element['ruta']})
                         business_elements.append({'business': element['business']})
                         service_name = element['service_name']
                 
-                # Check for response elements
+                # 🔹 Verificar si `response_key` está en `response_data['elemento']`
                 for element in response_data:
-                    if response_key in element['elemento']:
+                    elemento_nombre = element['elemento']
+
+                    # ✅ Verificar coincidencia exacta o parcial
+                    match = difflib.get_close_matches(response_key, [elemento_nombre], n=1, cutoff=0.9)
+                    
+                    if match or response_key in elemento_nombre:  
                         response_elements.append({'name': element['name'], 'type': element['type']})
                         service_name = element['service_name']
             
@@ -1010,6 +1019,14 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             for operation, elements in operation_elements.items():
                 
+                st.write(f"🔹 Procesando operación: {operation}")
+                st.write(f"📌 Cantidad de elementos request: {len(elements['request'])}")
+                st.write(f"📌 Cantidad de elementos response: {len(elements['response'])}")
+
+                if not elements['request']:
+                    st.warning(f"⚠️ La operación {operation} no tiene elementos de entrada, saltando...")
+                    continue  # Si no hay request, no genera el documento
+
                 if elements['request']:
                     
                     st.success(f"✅ Proyecto {elements['ruta'][0]['ruta'].lstrip('/')}")
