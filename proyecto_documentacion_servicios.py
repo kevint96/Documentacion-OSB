@@ -26,9 +26,6 @@ import glob
 import base64
 import sys
 
-# 📂 Definir directorio temporal para almacenamiento
-UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "uploaded_files")
-
 def print_with_line_number(msg):
     caller_frame = inspect.currentframe().f_back
     line_number = caller_frame.f_lineno
@@ -1323,59 +1320,41 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar):
             key="download_all",
         )
 
-def limpiar_directorio():
-    """Elimina el contenido del directorio de subida antes de guardar un nuevo archivo."""
-    if os.path.exists(UPLOAD_FOLDER):
-        shutil.rmtree(UPLOAD_FOLDER)  # 🔥 Borra todo el contenido
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # 📂 Crea el directorio limpio
-
-
-def guardar_archivo(archivo):
-    """Guarda el archivo subido y retorna su ruta."""
-    limpiar_directorio()  # 🔥 Limpiar todo antes de guardar el nuevo archivo
-    
-    file_path = os.path.join(UPLOAD_FOLDER, archivo.name)
-    with open(file_path, "wb") as f:
-        f.write(archivo.getbuffer())  # 📌 Guarda el archivo
-    return file_path
-
 def main():
     st.title("📄 Generador de Documentación OSB")
     
-    # 📌 Subir archivos
-    jar_file = st.file_uploader("📂 Sube el archivo .jar con dependencias", type=["jar"])
-    plantilla_file = st.file_uploader("📄 Sube la plantilla de Word", type=["docx"])
-    operacion_a_documentar = st.text_input("🔍 Operación a documentar (opcional)")
+    jar_file = st.file_uploader("Sube el archivo .jar con dependencias", type=["jar"])
+    plantilla_file = st.file_uploader("Sube la plantilla de Word", type=["docx"])
+    operacion_a_documentar = st.text_input("Operacion")
     
-    carpeta_destino = os.path.join(UPLOAD_FOLDER, "extraccion_jar")  # 📂 Carpeta donde se extraerán los archivos
-    
-    jar_path = None  # Inicializar variable para evitar errores
     if jar_file:
-        jar_path = guardar_archivo(jar_file, "temp.jar")  # 🔹 Guardar JAR limpio
+        jar_path = "temp.jar"
+
+        # Guardar el archivo
+        with open(jar_path, "wb") as f:
+            f.write(jar_file.getbuffer())
+
+        # Ruta donde se extraerán los archivos
+        carpeta_destino = "extraccion_jar"
+
+        # Extraer los archivos del .jar
+        try:
+            with zipfile.ZipFile(jar_path, "r") as jar:
+                jar.extractall(carpeta_destino)
+                archivos_extraidos = jar.namelist()
+            
+            #st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
+            st.write("📂 Archivos extraídos:")
+            st.write(archivos_extraidos)
+        except zipfile.BadZipFile:
+            st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
     
-        if jar_path:
-            # 🔹 Extraer los archivos del .jar
-            try:
-                shutil.rmtree(carpeta_destino, ignore_errors=True)  # 🔥 Eliminar extracciones previas
-                os.makedirs(carpeta_destino, exist_ok=True)  # 📂 Crear carpeta limpia
-                
-                with zipfile.ZipFile(jar_path, "r") as jar:
-                    jar.extractall(carpeta_destino)
-                    archivos_extraidos = jar.namelist()
-                
-                st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
-                st.write("📂 Archivos extraídos:")
-                st.write(archivos_extraidos)
-            except zipfile.BadZipFile:
-                st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
-    
-    # 📌 Botón para generar la documentación
-    if st.button("📝 Generar Documentación"):
-        if jar_path and plantilla_file:
-            with st.spinner("⏳ Generando documentación..."):
-                generar_documentacion(carpeta_destino, plantilla_file, operacion_a_documentar)
+    if st.button("Generar Documentación"):
+        if jar_file and plantilla_file:
+            with st.spinner("Generando documentación..."):
+                generar_documentacion(carpeta_destino, plantilla_file,operacion_a_documentar)
         else:
-            st.error("⚠️ Por favor, sube todos los archivos antes de generar la documentación.")
+            st.error("Por favor, sube todos los archivos y proporciona la ruta de destino.")
 
 if __name__ == "__main__":
     main()
