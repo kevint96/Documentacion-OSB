@@ -1380,7 +1380,7 @@ def main():
                 jar.extractall(carpeta_destino)
                 archivos_extraidos = jar.namelist()
 
-            st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
+            #st.success(f"✅ Archivos extraídos en: {carpeta_destino}")
         except zipfile.BadZipFile:
             st.error("❌ Error: El archivo no es un JAR válido o está dañado.")
 
