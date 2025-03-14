@@ -997,7 +997,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
             if total_operaciones > 1:
                 progreso_actual = int((idx / total_operaciones) * 100)
                 progress_bar_general.progress(progreso_actual)  # 🔄 Actualizar barra general
-                st.success(f"⏳ Procesando operación {idx}/{total_operaciones}: {operation} ({progreso_actual}%)")
+                #st.success(f"⏳ Procesando operación {idx}/{total_operaciones}: {operation} ({progreso_actual}%)")
             else:
                 st.success(f"⏳ Procesando operación {idx}/{total_operaciones}: {operation}")
             
