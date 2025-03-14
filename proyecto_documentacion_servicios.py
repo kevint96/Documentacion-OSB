@@ -827,9 +827,11 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                 operations = extract_wsdl_operations(wsdl_path)
                                 #st.success(f"operations: {operations}")
                                 imports = extract_xsd_import_paths(wsdl_path)
-                                #st.success(f"imports: {imports}")
+                                st.success(f"imports: {imports}")
                                 #print_with_line_number("_________PRUEBA__________")
                                 #print_with_line_number("")
+                                
+                                st.success(f"project_path: {project_path}")
                                 
                                 if operacion_a_documentar in operations or not operacion_a_documentar:
                                     for operation in operations:
@@ -848,7 +850,7 @@ def extract_osb_services_with_http_provider_id(project_path,operacion_a_document
                                                     operation_to_xsd[operation] = None  # No se encontró una coincidencia
                                             
                                     
-                                    #st.success(f"operation_to_xsd: {operation_to_xsd}")
+                                    st.success(f"operation_to_xsd: {operation_to_xsd}")
                                     
                                     # ✅ Si el usuario especificó una operación, verificar si existe en operation_to_xsd
                                     if operacion_a_documentar and operacion_a_documentar not in operation_to_xsd:
