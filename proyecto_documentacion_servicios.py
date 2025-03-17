@@ -1258,6 +1258,14 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         tbl.getparent().remove(tbl)
                         while len(tabla_cabecera_salida.rows) > 1:
                             tabla_cabecera_salida._element.remove(tabla_cabecera_salida.rows[1]._element)
+                    
+                    # Limpiar la tabla antes de agregar elementos de esta operación
+                    while len(tabla_cabecera_entrada.rows) > 2:
+                        tabla_cabecera_entrada._element.remove(tabla_cabecera_entrada.rows[2]._element)
+                        
+                    # Limpiar la tabla antes de agregar elementos de esta operación
+                    while len(tabla_cabecera_salida.rows) > 2:
+                        tabla_cabecera_salida._element.remove(tabla_cabecera_salida.rows[2]._element)
 
                     # Limpiar la tabla antes de agregar elementos de esta operación
                     while len(tabla_request.rows) > 2:

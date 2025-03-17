@@ -1273,12 +1273,9 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         obligatorio = "NO"
                         #if 'cabeceraEntrada.' not in elem['name']:
                         # Añadir una nueva fila al final de la tabla
-                        fila_cabecera_entrada = tabla_cabecera_entrada.add_row().cells
-                        fila = tabla_request.add_row().cells
-                        
-                        # Rellenar la fila con los datos correspondientes
                         #fila[0].text = operation + "Request" + "." + elem['name']
                         if 'cabeceraEntrada' in elem['name']:
+                            fila_cabecera_entrada = tabla_cabecera_entrada.add_row().cells
                             fila_cabecera_entrada[0].text = elem['name']
                             #st.success(f"fila[0].text: {fila[0].text}")
                             fila_cabecera_entrada[1].text = elem['name']
@@ -1294,6 +1291,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                                 tipo_campo = 'String'
                             fila_cabecera_entrada[3].text = tipo_campo
                         else:
+                            fila = tabla_request.add_row().cells
                             fila[0].text = elem['name']
                             #st.success(f"fila[0].text: {fila[0].text}")
                             fila[1].text = elem['name']
@@ -1323,12 +1321,10 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                         obligatorio = "NO"
                         #if 'cabeceraSalida.' not in elem['name']:
                         # Añadir una nueva fila al final de la tabla
-                        fila_cabecera_salida = tabla_cabecera_salida.add_row().cells
-                        fila = tabla_response.add_row().cells
-                        
                         # Rellenar la fila con los datos correspondientes
                         #fila[0].text = operation + "Response" + "." + elem['name']
                         if 'cabeceraSalida' in elem['name']:
+                            fila_cabecera_salida = tabla_cabecera_salida.add_row().cells
                             fila_cabecera_salida[0].text = elem['name']
                             #st.success(f"fila[0].text: {fila[0].text}")
                             fila_cabecera_salida[1].text = elem['name']
@@ -1344,6 +1340,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                                 tipo_campo = 'String'
                             fila_cabecera_salida[3].text = tipo_campo
                         else:
+                            fila = tabla_response.add_row().cells
                             fila[0].text = elem['name']
                             #st.success(f"fila[0].text: {fila[0].text}")
                             fila[1].text = elem['name']
