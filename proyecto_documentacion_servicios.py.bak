@@ -1095,11 +1095,11 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     contiene_cabecera_salida = False
                     
                     if any('cabeceraEntrada.' in elem['name'] for elem in elements['request']):
-                        st.write("Se encontró al menos un elemento con '.cabeceraEntrada.'")
+                        #st.write("Se encontró al menos un elemento con '.cabeceraEntrada.'")
                         contiene_cabecera_entrada = True
                     
                     if any('cabeceraSalida.' in elem['name'] for elem in elements['response']):
-                        st.write("Se encontró al menos un elemento con '.cabeceraSalida.'")
+                        #st.write("Se encontró al menos un elemento con '.cabeceraSalida.'")
                         contiene_cabecera_salida = True
                         
                     # Cargar el documento de la plantilla
@@ -1172,7 +1172,7 @@ def generar_documentacion(jar_path, plantilla_path,operacion_a_documentar,nombre
                     #st.success(f"variables: {variables}")
                     
                     total_tablas = len(doc.tables)
-                    st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
+                    #st.success(f"🔍 Total de tablas en el documento: {total_tablas}")
                     if total_operaciones == 1:
                         progress_bar_general = st.progress(30)
                     
